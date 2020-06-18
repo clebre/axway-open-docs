@@ -5,154 +5,71 @@
 "date": "2020-04-29",
 "description": "Axway AMPLIFY™ API Management Container Reference Architecture on **Azure**"
 }
--- -- ----------------------------------------------------------------------------- --
 
-
-Architecture
-Axway AMPLIFY™ API Management Container Reference Architecture on **Azure**
-Version 1.0 April 29, 2020
-
-
-
-1.
-
-Document History
-
-Version   Date         Update origin
---------- ------------ ---------------
-1.0       2020-04-29   First version
 
 Table of Contents {#table-of-contents .TOC-Heading}
 =================
 
-[1. Overview 6](#overview)
-
-[1.1. References 6](#references)
-
-[1.1.1. List of tables 6](#list-of-tables)
-
-[1.1.2. List of pictures 6](#list-of-pictures)
-
-[2. General architecture 7](#general-architecture)
-
-[2.1. Principles 7](#principles)
-
-[2.2. Target use case 8](#target-use-case)
-
-[2.3. Additional components and considerations
-9](#additional-components-and-considerations)
-
-[2.3.1. Container registry 9](#container-registry)
-
-[2.3.2. Bastion host 10](#bastion-host)
-
-[2.3.3. DevOps Pipeline 10](#devops-pipeline)
-
-[2.3.4. SMTP Relay 10](#smtp-relay)
-
-[2.4. Performance goals 11](#performance-goals)
-
-[3. Implementation details 12](#implementation-details)
-
-[3.1. Diagram 12](#diagram)
-
-[3.1.1. Technical view 12](#technical-view)
-
-[3.1.2. Application view 13](#application-view)
-
-[3.2. Choice of runtime infrastructure components
-13](#choice-of-runtime-infrastructure-components)
-
-[3.2.1. Network specification 14](#network-specification)
-
-[3.2.2. Azure Kubernetes Services (AKS) sizes
-17](#azure-kubernetes-services-aks-sizes)
-
-[3.2.3. Cassandra cluster size 17](#cassandra-cluster-size)
-
-[3.2.4. Azure Database for Mysql 18](#azure-database-for-mysql)
-
-[3.2.5. Azure Files Premium (AFP) for shared storage.
-18](#azure-files-premium-afp-for-shared-storage.)
-
-[3.2.6. Azure Blob Storage for logs 19](#azure-blob-storage-for-logs)
-
-[3.2.7. Azure App Gateway or Azure Load Balancer
-19](#azure-app-gateway-or-azure-load-balancer)
-
-[3.2.8. Azure Container Registry 20](#azure-container-registry)
-
-[3.3. Kubernetes considerations 21](#kubernetes-considerations)
-
-[3.3.1. Deployment options 21](#deployment-options)
-
-[3.3.2. Namespaces 22](#namespaces)
-
-[3.3.3. Pod resource limits 22](#pod-resource-limits)
-
-[3.3.4. Components healthcheck 23](#components-healthcheck)
-
-[3.3.5. Affinity and anti-affinity mode
-23](#affinity-and-anti-affinity-mode)
-
-[3.3.6. Autoscaling 24](#autoscaling)
-
-[3.3.7. External traffic 25](#external-traffic)
-
-[3.3.8. Secrets 26](#secrets)
-
-[3.4. API Management implementation details
-27](#api-management-implementation-details)
-
-[3.4.1. Admin Node Manager 27](#admin-node-manager)
-
-[3.4.2. API Manager UI 28](#api-manager-ui)
-
-[3.4.3. API Gateway/Manager (traffic) 29](#api-gatewaymanager-traffic)
-
-[3.5. Cassandra considerations 30](#cassandra-considerations)
-
-[3.6. Security considerations 31](#security-considerations)
-
-[3.7. SQL database considerations 31](#sql-database-considerations)
-
-[3.8. Logging/tracing 31](#loggingtracing)
-
-[3.9. Monitoring 32](#monitoring)
-
-[3.10. Environmentalization and Promotion
-32](#environmentalization-and-promotion)
-
-[3.11. Performance testing 34](#performance-testing)
-
-[3.11.1. Load test with 60 threads 34](#load-test-with-60-threads)
-
-[3.11.2. Load test with 200 threads 35](#load-test-with-200-threads)
-
-[4. Maintenance 35](#maintenance)
-
-[4.1. New configurations 35](#new-configurations)
-
-[4.2. Product updates 36](#product-updates)
-
-[4.2.1. Installing a patch 36](#installing-a-patch)
-
-[4.2.2. Installing a service pack 38](#installing-a-service-pack)
-
-[4.2.3. Upgrading the product 38](#upgrading-the-product)
-
-[4.2.4. Adding customization 38](#adding-customization)
-
-[4.3. Pushing a new Docker image to your Kubernetes cluster
-38](#pushing-a-new-docker-image-to-your-kubernetes-cluster)
-
-[5. Configuration and data backups 39](#configuration-and-data-backups)
-
-[6. Disaster recovery 40](#disaster-recovery)
-
-[7. Known constraints and roadmap 40](#known-constraints-and-roadmap)
-
-[8. Appendix A -- Glossary of Terms 41](#appendix-a-glossary-of-terms)
+[1. Overview](#overview)
+[1.1. References](#references)
+[1.1.1. List of tables](#list-of-tables)
+[1.1.2. List of pictures](#list-of-pictures)
+[2. General architecture](#general-architecture)
+[2.1. Principles](#principles)
+[2.2. Target use case](#target-use-case)
+[2.3. Additional components and considerations](#additional-components-and-considerations)
+[2.3.1. Container registry](#container-registry)
+[2.3.2. Bastion host](#bastion-host)
+[2.3.3. DevOps Pipeline](#devops-pipeline)
+[2.3.4. SMTP Relay](#smtp-relay)
+[2.4. Performance goals](#performance-goals)
+[3. Implementation details](#implementation-details)
+[3.1. Diagram](#diagram)
+[3.1.1. Technical view](#technical-view)
+[3.1.2. Application view](#application-view)
+[3.2. Choice of runtime infrastructure components](#choice-of-runtime-infrastructure-components)
+[3.2.1. Network specification](#network-specification)
+[3.2.2. Azure Kubernetes Services (AKS) sizes](#azure-kubernetes-services-aks-sizes)
+[3.2.3. Cassandra cluster size](#cassandra-cluster-size)
+[3.2.4. Azure Database for Mysql](#azure-database-for-mysql)
+[3.2.5. Azure Files Premium (AFP) for shared storage](#azure-files-premium-afp-for-shared-storage.)
+[3.2.6. Azure Blob Storage for logs](#azure-blob-storage-for-logs)
+[3.2.7. Azure App Gateway or Azure Load Balancer](#azure-app-gateway-or-azure-load-balancer)
+[3.2.8. Azure Container Registry](#azure-container-registry)
+[3.3. Kubernetes considerations](#kubernetes-considerations)
+[3.3.1. Deployment options](#deployment-options)
+[3.3.2. Namespaces](#namespaces)
+[3.3.3. Pod resource limits](#pod-resource-limits)
+[3.3.4. Components healthcheck](#components-healthcheck)
+[3.3.5. Affinity and anti-affinity mode](#affinity-and-anti-affinity-mode)
+[3.3.6. Autoscaling](#autoscaling)
+[3.3.7. External traffic](#external-traffic)
+[3.3.8. Secrets](#secrets)
+[3.4. API Management implementation details](#api-management-implementation-details)
+[3.4.1. Admin Node Manager](#admin-node-manager)
+[3.4.2. API Manager UI](#api-manager-ui)
+[3.4.3. API Gateway/Manager (traffic)](#api-gatewaymanager-traffic)
+[3.5. Cassandra considerations](#cassandra-considerations)
+[3.6. Security considerations](#security-considerations)
+[3.7. SQL database considerations](#sql-database-considerations)
+[3.8. Logging/tracing](#loggingtracing)
+[3.9. Monitoring](#monitoring)
+[3.10. Environmentalization and Promotion](#environmentalization-and-promotion)
+[3.11. Performance testing](#performance-testing)
+[3.11.1. Load test with 60 threads](#load-test-with-60-threads)
+[3.11.2. Load test with 200 threads](#load-test-with-200-threads)
+[4. Maintenance](#maintenance)
+[4.1. New configurations](#new-configurations)
+[4.2. Product updates](#product-updates)
+[4.2.1. Installing a patch](#installing-a-patch)
+[4.2.2. Installing a service pack](#installing-a-service-pack)
+[4.2.3. Upgrading the product](#upgrading-the-product)
+[4.2.4. Adding customization](#adding-customization)
+[4.3. Pushing a new Docker image to your Kubernetes cluster](#pushing-a-new-docker-image-to-your-kubernetes-cluster)
+[5. Configuration and data backups](#configuration-and-data-backups)
+[6. Disaster recovery](#disaster-recovery)
+[7. Known constraints and roadmap](#known-constraints-and-roadmap)
+[8. Appendix A -- Glossary of Terms](#appendix-a-glossary-of-terms)
 
 Summary
 
@@ -204,68 +121,32 @@ References
 
 ### List of tables
 
-[Table 1: Deployment architecture - global recommendations
-8](#_Toc39071612)
-
-[Table 2: Sensitive parameters 10](#_Toc39071613)
-
-[Table 3: List of assets 14](#_Toc39071614)
-
-[Table 4: Bastion NSG rules 15](#_Toc39071615)
-
-[Table 5: AKS NSG rules 15](#_Toc39071616)
-
-[Table 6: Data NSG rules 16](#_Toc39071617)
-
-[Table 7: PaaS rules configuration 16](#_Toc39071618)
-
-[Table 8: Ingress controller options 26](#_Toc39071619)
-
-[Table 9: Kubernetes secrets list 26](#_Toc39071620)
-
-[Table 10: Performance validation threshold with 60 threads
-34](#_Toc39071621)
-
-[Table 11: Performance validation threshold with 200 threads
-35](#_Toc39071622)
+[Table 1: Deployment architecture - global recommendations](#_Toc39071612)
+[Table 2: Sensitive parameters](#_Toc39071613)
+[Table 3: List of assets](#_Toc39071614)
+[Table 4: Bastion NSG rules](#_Toc39071615)
+[Table 5: AKS NSG rules](#_Toc39071616)
+[Table 6: Data NSG rules](#_Toc39071617)
+[Table 7: PaaS rules configuration](#_Toc39071618)
+[Table 8: Ingress controller options](#_Toc39071619)
+[Table 9: Kubernetes secrets list](#_Toc39071620)
+[Table 10: Performance validation threshold with 60 threads](#_Toc39071621)
+[Table 11: Performance validation threshold with 200 threads](#_Toc39071622)
 
 ### List of pictures
 
-[Figure 1: Layered deployment
-8](#_Toc39071623)
-
-[Figure 2: Components overview
-9](#_Toc39071624)
-
-[Figure 3: Technical diagram for HA deployment
-12](#_Toc39071625)
-
-[Figure 4: Kubernetes objects deployment
-13](#_Toc39071626)
-
-[Figure 5: Network flow diagram
-14](#_Toc39071627)
-
-[Figure 6: Nodes pool configuration
-17](#_Toc39071628)
-
-[Figure 7: Disk space setting in Policy Studio
-18](#_Toc39071629)
-
-[Figure 8: Azure Application Gateway with ingress controller
-20](#_Toc39071630)
-
-[Figure 9: Azure Load balancer with ingress controller
-20](#_Toc39071631)
-
-[Figure 10: API and policy promotion
-33](#_Toc39071632)
-
-[Figure 11: Performance diagram
-34](#_Toc39071633)
-
-[Figure 12: Creating docker images
-36](#_Toc39071634)
+[Figure 1: Layered deployment](#_Toc39071623)
+[Figure 2: Components overview](#_Toc39071624)
+[Figure 3: Technical diagram for HA deployment](#_Toc39071625)
+[Figure 4: Kubernetes objects deployment](#_Toc39071626)
+[Figure 5: Network flow diagram](#_Toc39071627)
+[Figure 6: Nodes pool configuration](#_Toc39071628)
+[Figure 7: Disk space setting in Policy Studio](#_Toc39071629)
+[Figure 8: Azure Application Gateway with ingress controller](#_Toc39071630)
+[Figure 9: Azure Load balancer with ingress controller](#_Toc39071631)
+[Figure 10: API and policy promotion](#_Toc39071632)
+[Figure 11: Performance diagram](#_Toc39071633)
+[Figure 12: Creating docker images](#_Toc39071634)
 
 General architecture
 ====================
@@ -308,8 +189,7 @@ manages many important aspects of runtime, security, and operations:
 In generic terms, reference architecture can be built by stacking four
 layers of different capabilities:
 
-![](/Images/apim-reference-architectures/container-azure/image1.png){width="6.552083333333333in"
-height="3.029861111111111in"}Notice that the packaging of API Management
+![](/Images/apim-reference-architectures/container-azure/image1.png)Notice that the packaging of API Management
 for deployment has changed in the EMT mode. Customers need to build a
 new Docker image for any new FED or POL file that they want to deploy
 (see
@@ -322,12 +202,12 @@ repository for created images. To help customers with setting up a
 required environment, the following table describes the required and
 recommended options.
 
-Description                                                                                          Required?
----------------------------------------------------------------------------------------------------- -------------
-A DevOps pipeline is strongly recommended for building Docker images                                 Recommended
-A storage system with enough capacity to store dedicated data and to share data between components   Required
-A bastion for administration tasks on API management and Kubernetes                                  Required
-A container registry to store Docker images                                                          Required
+|Description|Required?|
+|---|---|
+|A DevOps pipeline is strongly recommended for building Docker images| Recommended|
+|A storage system with enough capacity to store dedicated data and to share data between components| Required|
+|A bastion for administration tasks on API management and Kubernetes|Required|
+|A container registry to store Docker images | Required|
 
 []{#_Toc39071612 .anchor}Table 1: Deployment architecture - global
 recommendations
@@ -398,11 +278,11 @@ credentials during Helm package deployment. We suggest using Kubernetes
 secrets. Besides registry access credentials, you will need to maintain
 additional sensitive data that is described in the following table.
 
-Description                                                                                                              Required?
------------------------------------------------------------------------------------------------------------------------- -------------
-Docker images contain such sensitive data as license key, certificate, and configuration. This data must be protected.   Required
-The password is sensitive and must be encrypted in the system.                                                           Required
-Operations should define a clear tag strategy for Docker images tagging.                                                 Recommended
+|Description|Required?|
+|---|---|
+|Docker images contain such sensitive data as license key, certificate, and configuration. This data must be protected.| Required|
+|The password is sensitive and must be encrypted in the system.| Required|
+|Operations should define a clear tag strategy for Docker images tagging. | Recommended|
 
 []{#_Toc39071613 .anchor}Table 2: Sensitive parameters
 
@@ -486,8 +366,7 @@ impact is on the Helm chart with affinity node configuration.
 
 ### Application view
 
-![](/Images/apim-reference-architectures/container-azure/image4.png){width="7.874305555555556in"
-height="4.105555555555555in"}This diagram represents the main objects
+![](/Images/apim-reference-architectures/container-azure/image4.png)This diagram represents the main objects
 inside Kubernetes with main configurations. High availability is also
 present in the pod specification.
 
@@ -503,19 +382,19 @@ out in various racks, rooms, or availability zones.
 The following table lists the number of runtime components in this
 configuration.
 
-Assets                                             Spec
--------------------------------------------------- -----------------
-Worker nodes^\*^                                   3 to 6
-Cassandra nodes                                    3
-Azure Database for Mysql                           [1]{.underline}
-Blob storage^\*^                                   70GB
-Azure file storage^\*^                             20GB
-External IP (public or private) ^\*^               1 min
-Azure Load Balancer or Azure Application Gateway   1
-Azure AD                                           1
-Azure container registry                           1
-Bastion                                            1
-Worker pipeline                                    1
+|Assets |Spec|
+|--- |---|
+|Worker nodes^\*^                                   |3 to 6|
+|Cassandra nodes                                    |3|
+|Azure Database for Mysql                           |[1]{.underline}|
+|Blob storage^\*^                                   |70GB|
+|Azure file storage^\*^                             |20GB|
+|External IP (public or private) ^\*^               |1 min|
+|Azure Load Balancer or Azure Application Gateway   |1|
+|Azure AD                                           |1|
+|Azure container registry                           |1|
+|Bastion                                            |1|
+|Worker pipeline                                    |1|
 
 []{#_Toc39071614 .anchor}Table 3: List of assets
 
@@ -523,8 +402,7 @@ Worker pipeline                                    1
 
 ### Network specification
 
-![](/Images/apim-reference-architectures/container-azure/image5.JPG){width="3.999002624671916in"
-height="3.178015091863517in"}This typical network deployment is based on
+![](/Images/apim-reference-architectures/container-azure/image5.JPG)This typical network deployment is based on
 a minimal number of segregated zones. It consists of 3 subnets in one
 Virtual Network for a dedicated VNET:
 
@@ -549,200 +427,57 @@ Note: the diagram in Figure 5 shows just one availability zone.
 
 #### Bastion NSG
 
-+----+------------+-----------+------------+----------+-------+
-| ID | D          | Direction | To         | Protocol | Ports |
-|    | escription |           |            |          |       |
-+====+============+===========+============+==========+=======+
-| 4  | Usage of   | Outbound  | K8S master | TCP      | 8001  |
-|    | Kube-proxy |           | subnet     |          |       |
-|    | to access  |           |            |          |       |
-|    | the        |           |            |          |       |
-|    | Kubernetes |           |            |          |       |
-|    | Dashboard  |           |            |          |       |
-+----+------------+-----------+------------+----------+-------+
-| 5  | Azure      | Outbound  | Azure      | TCP      | 3306  |
-|    | Database   |           |            |          |       |
-|    | for Mysql  |           |            |          |       |
-+----+------------+-----------+------------+----------+-------+
-| 6  | Access for | Outbound  | Data       | TCP      | 9042  |
-|    | admi       |           | subnet     |          |       |
-|    | nistration |           |            |          |       |
-|    | database   |           |            |          |       |
-|    | tasks      |           |            |          |       |
-+----+------------+-----------+------------+----------+-------+
-| 8  | Pull (&    | Outbound  | Azure      | TCP      | 443   |
-|    | push) Helm |           | Container  |          |       |
-|    | package on |           | registry   |          |       |
-|    | Docker     |           |            |          |       |
-|    | registry   |           |            |          |       |
-+----+------------+-----------+------------+----------+-------+
-| 12 | Access to  | Inbound   | Bastion    | TCP      | 3389  |
-|    | bastion    |           | subnet     |          |       |
-|    | hosts      |           |            |          | 22    |
-+----+------------+-----------+------------+----------+-------+
+| ID | Description          | Direction | To         | Protocol | Ports |
+|---    |---  | ---          |---            | ---         |---       |
+| 4  | Usage of Kube-proxy to access the Kubernetes Dashboard   | Outbound  | K8S master subnet | TCP      | 8001  |
+| 5  | Azure Database for Mysql      | Outbound  | Azure      | TCP      | 3306  |
+| 6  | Access for administration database tasks | Outbound  | Data subnet| TCP      | 9042  |
+| 8  | Pull (& push) Helm package on Docker registry    | Outbound  | Azure Container registry| TCP      | 443   |
+| 12 |Access to bastion hosts  | Inbound   | Bastion subnet   | TCP      | 3389 22 |
 
 []{#_Toc39071615 .anchor}Table 4: Bastion NSG rules
 
 #### AKS NSG
 
-+----+-----------+-----------+-----------+----------+---------+
-| ID | De        | Direction | To        | Protocol | Ports   |
-|    | scription |           |           |          |         |
-+====+===========+===========+===========+==========+=========+
-| 2  | Flow      | Inbound   | AKS       | TCP      | 443     |
-|    | between   |           | Subnet    |          |         |
-|    | Azure     |           |           |          |         |
-|    | Load      |           |           |          |         |
-|    | Balancer  |           |           |          |         |
-|    | and       |           |           |          |         |
-|    | ingress   |           |           |          |         |
-|    | c         |           |           |          |         |
-|    | ontroller |           |           |          |         |
-|    | (see      |           |           |          |         |
-|    | section   |           |           |          |         |
-|    | 3.2.7     |           |           |          |         |
-|    | Azure App |           |           |          |         |
-|    | Gateway   |           |           |          |         |
-|    | or Azure  |           |           |          |         |
-|    | Load      |           |           |          |         |
-|    | Balancer) |           |           |          |         |
-+----+-----------+-----------+-----------+----------+---------+
-| 3  | Co        | Outbound  | Data      | TCP      | 9042    |
-|    | nnections |           | subnet    |          |         |
-|    | from      |           |           |          | 7070    |
-|    | Axway     |           |           |          |         |
-|    | c         |           |           |          |         |
-|    | omponents |           |           |          |         |
-|    | to        |           |           |          |         |
-|    | C         |           |           |          |         |
-|    | assandra. |           |           |          |         |
-|    |           |           |           |          |         |
-|    | Also used |           |           |          |         |
-|    | for       |           |           |          |         |
-|    | P         |           |           |          |         |
-|    | rometheus |           |           |          |         |
-|    | c         |           |           |          |         |
-|    | onnection |           |           |          |         |
-|    | to JMX    |           |           |          |         |
-|    | exporter  |           |           |          |         |
-|    | port      |           |           |          |         |
-+----+-----------+-----------+-----------+----------+---------+
-| 7  | Egress    | Outbound  | Public    | TCP      | 443     |
-|    | flow to   |           | network\  |          |         |
-|    | pull      |           | intranet  |          |         |
-|    | Docker    |           |           |          |         |
-|    | images    |           |           |          |         |
-+----+-----------+-----------+-----------+----------+---------+
-|    | Egress    | Outbound  | Public    | TCP      | 465-587 |
-|    | flow to   |           | network\  |          |         |
-|    | send      |           | intranet  |          |         |
-|    | email to  |           |           |          |         |
-|    | SMTP      |           |           |          |         |
-|    | relay     |           |           |          |         |
-|    | (re       |           |           |          |         |
-|    | presented |           |           |          |         |
-|    | by        |           |           |          |         |
-|    | SendGrid  |           |           |          |         |
-|    | in the    |           |           |          |         |
-|    | diagram)  |           |           |          |         |
-+----+-----------+-----------+-----------+----------+---------+
-|    | C         | Outbound  | Public    | TCP      | 443     |
-|    | onnection |           | network\  |          |         |
-|    | to        |           | intranet  |          |         |
-|    | external  |           |           |          |         |
-|    | identity  |           |           |          |         |
-|    | access    |           |           |          |         |
-|    | m         |           |           |          |         |
-|    | anagement |           |           |          |         |
-+----+-----------+-----------+-----------+----------+---------+
-| 13 | Co        | Outbound  | Azure     | TCP      | 3306    |
-|    | nnections |           | Database  |          |         |
-|    | from      |           | for Mysql |          |         |
-|    | Axway     |           |           |          |         |
-|    | c         |           |           |          |         |
-|    | omponents |           |           |          |         |
-|    | to API    |           |           |          |         |
-|    | Analytics |           |           |          |         |
-+----+-----------+-----------+-----------+----------+---------+
+| ID | Description        | Direction | To        | Protocol | Ports   |
+|---    |---  | ---          |---            | ---         |---       |
+| 2  | Flow between Azure Load Balancer and ingress controller (see section 3.2.7 Azure App Gateway or Azure Load Balancer)      | Inbound   | AKS subnet| TCP      | 443     |
+| 3  | Connections from Axway components to Cassandra. Also used for Prometheus connection to JMX exporter port  | Outbound  | Data subnet| TCP      | 9042    |
+| 7  | Egress flow to pull Docker images    | Outbound  | Public network intranet    | TCP      | 443     |
+
+|    | EgEgress flow to send email to SMTP relay (represented by SendGrid in the diagram)  | Outbound  | Public  network intranet  | TCP      | 465-587 |
+|    | Connection to external identity access management  | Outbound  | Public network intranet    | TCP      | 443     |
+| 13 | Connections from Axway components to API Analytics  | Outbound  | Azure Database for Mysql| TCP      | 3306 |
 
 []{#_Toc39071616 .anchor}Table 5: AKS NSG rules
 
 #### Data NSG
 
-+----+------------+------------+------------+----------+-------+
-| ID | D          | From       | To         | Protocol | Ports |
-|    | escription |            |            |          |       |
-+====+============+============+============+==========+=======+
-| 3  | C          | K8S worker | Data       | TCP      | 9042  |
-|    | onnections | subnet     | subnet     |          |       |
-|    | from Axway |            |            |          | 3306  |
-|    | components |            |            |          |       |
-|    | to         |            |            |          |       |
-|    | Cassandra  |            |            |          |       |
-|    | and API    |            |            |          |       |
-|    | Analytics  |            |            |          |       |
-+----+------------+------------+------------+----------+-------+
-| 6  | Admi       | Bastion    | Data       | TCP      | 9042  |
-|    | nistration | subnet     | subnet     |          |       |
-|    | tasks from |            |            |          | 3306  |
-|    | Bastion to |            |            |          |       |
-|    | Databases  |            |            |          | 22    |
-+----+------------+------------+------------+----------+-------+
-| 11 | Access to  | Outbound   | Frontal    | TCP      | 443   |
-|    | the        |            | subnet     |          |       |
-|    | admi       |            |            |          |       |
-|    | nistration |            |            |          |       |
-|    | web        |            |            |          |       |
-|    | interface  |            |            |          |       |
-|    | (ANM)      |            |            |          |       |
-+----+------------+------------+------------+----------+-------+
+| ID | Description          | From       | To         | Protocol | Ports |
+|---    |---  | ---          |---            | ---         |---       |
+| 3  | Connections from Axway components to Cassandra and API Analytics   | K8S worker subnet | Data       | TCP      | 9042 3306 |
+| 6  | Administration tasks from Bastion to Databases | Bastion subnet| Data subnet  | TCP      | 9042 3306 22 |
+| 11 | Access to the administration web interface (ANM)  | Outbound   | Frontal subnet| TCP      | 443   |
 
 []{#_Toc39071617 .anchor}Table 6: Data NSG rules
 
 #### PaaS firewalling configuration
 
-+----+--------------------+--------------------+--------------------+
 | ID | Components         | Kind               | Rules              |
-+====+====================+====================+====================+
-| 1  | Azure App Gateway  | Public network\    | No rules.          |
-|    | inbound            | intranet           |                    |
-+----+--------------------+--------------------+--------------------+
-| 2  | Azure App Gateway  | Backends           | Select the AKS     |
-|    | Outbound           | specification      | node pool only.    |
-+----+--------------------+--------------------+--------------------+
-| 1a | Azure Database for | Private Endpoint   | Allow Mysql        |
-|    | Mysql              |                    | connections from   |
-|    |                    |                    | **AKS Subnet** and |
-|    |                    |                    | **Bastion          |
-|    |                    |                    | Subnet.**          |
-+----+--------------------+--------------------+--------------------+
-| 9  | Shared Files       | Firewalls and      | Allow flow from    |
-|    | Premium            | Virtual networks   | the **AKS          |
-|    |                    |                    | subnet**.          |
-+----+--------------------+--------------------+--------------------+
-| 10 | Storage blob       | Firewalls and      | Allow flow from    |
-|    |                    | Virtual networks   | the **AKS          |
-| 11 |                    |                    | subnet**.          |
-+----+--------------------+--------------------+--------------------+
-| 7\ | Azure Container    | Firewalls and      | Allow flow from    |
-| 8  | Registry           | Virtual networks   | **AKS Subnet** and |
-|    |                    |                    | **Bastion          |
-|    |                    |                    | Subnet**.          |
-|    |                    |                    |                    |
-|    |                    |                    | Also, add your     |
-|    |                    |                    | **DevOps pipeline  |
-|    |                    |                    | worker** for       |
-|    |                    |                    | automatic          |
-|    |                    |                    | containers         |
-|    |                    |                    | creation.          |
-+----+--------------------+--------------------+--------------------+
+|---    |---  | ---          |---            |
+| 1  | Azure App Gateway inbound | Public network intranet    | No rules.          |
+| 2  | Azure App Gateway Outbound | Backends specification| Select the AKS node pool only.|
+| 1a | Azure Database for Mysql | Private Endpoint   | Allow Mysql connections from ***AKS Subnet*** and ***Bastion Subnet***.        |
+| 9  | Shared Files  Premium     | Firewalls and Virtual networks| Allow flow from the **AKS subnet**.|
+| 10 11| Storage blob       | Firewalls and Virtual networks| Allow flow from the **AKS subnet**.|
+| 7 8 | Azure Container Registry| Firewalls and Virtual networks| Allow flow from ***AKS Subnet*** and ***Bastion Subnet.***
+Also, add your ***DevOps pipeline worker*** for automatic containers creation |
 
 []{#_Toc39071618 .anchor}Table 7: PaaS rules configuration
 
 ### Azure Kubernetes Services (AKS) sizes
 
-![](/Images/apim-reference-architectures/container-azure/image6.png){width="1.9618055555555556in"
-height="2.8465277777777778in"}AKS is a platform as a Service managed by
+![](/Images/apim-reference-architectures/container-azure/image6.png)AKS is a platform as a Service managed by
 Microsoft. Customers cannot access the Kubernetes master component. They
 must use a client like Azure CLI or Azure Portal to configure the
 control plane. Using AKS, customers have the advantage of creating a
@@ -775,9 +510,9 @@ additional tools.
 make affinity and anti-affinity configuration between both pods and
 nodes. They are defined in Helm chart value.
 
-Description                                                                                                                                                   Type
-------------------------------------------------------------------------------------------------------------------------------------------------------------- -------------
-Node Autoscaler is triggered when a pod fails to be scheduled. Add node scheduling logic to create a new worker node before a cluster exhausts its capacity   Recommended
+|Description | Type |
+|---|---|
+|Node Autoscaler is triggered when a pod fails to be scheduled. Add node scheduling logic to create a new worker node before a cluster exhausts its capacity | Recommended|
 
 ### Cassandra cluster size
 
@@ -796,10 +531,10 @@ flow rate. See
 [here](https://azure.microsoft.com/en-us/pricing/details/managed-disks/)
 for more information about managed disks.
 
-Description                                      Type
------------------------------------------------- -----------------
-Use of Cosmos DB                                 Not recommended
-Cassandra nodes spread on 3 availability zones   Recommended
+|Description | Type |
+|---|---|
+|Use of Cosmos DB                                 |Not recommended|
+|Cassandra nodes spread on 3 availability zones   |Recommended|
 
 ### Azure Database for Mysql
 
@@ -813,11 +548,11 @@ in this plan is 50 GB with 150 IOPS. See
 [here](https://docs.microsoft.com/en-us/azure/mysql/concepts-pricing-tiers)
 for a complete description of the vCore and pricing tier.
 
-Description                                     Type
------------------------------------------------ -------------
-Use a standard plan with 50GB (for bandwidth)   Recommended
-Activate TLS configuration                      Recommended
-Use Endpoint termination                        Recommended
+|Description | Type |
+|---|---|
+|Use a standard plan with 50GB (for bandwidth)   |Recommended|
+|Activate TLS configuration                      |Recommended|
+|Use Endpoint termination                        |Recommended|
 
 ### Azure Files Premium (AFP) for shared storage.
 
@@ -832,8 +567,7 @@ storage of **13 GB** must be configured.
 
 Please, follow this method to estimate disk space:
 
-> ![](/Images/apim-reference-architectures/container-azure/image8.png){width="3.4730741469816273in"
-> height="2.0541666666666667in"}*Max\_disk\_space x
+> ![](/Images/apim-reference-architectures/container-azure/image8.png)*Max\_disk\_space x
 > API\_gateway\_max\_replica + 1GB = recommended\_disk\_space*
 
 It is important to select a proper disk option for logs in your target
@@ -873,32 +607,18 @@ in this architecture. It performs important tasks of **terminating TLS
 connection** and **request routing**. Two solutions are possible with
 this architecture:
 
-+----------------------------------+----------------------------------+
-| Azure Application Gateway        | Azure Load Balancer              |
-+==================================+==================================+
-| Azure Application Gateway has a  | Azure Load Balancer is a         |
-| mode for the Ingress controller  | traditional load balancer. An    |
-| (AGIC). It is fully managed by   | ingress component is based on    |
-| Azure and configuration is the   | Nginx. In this case, the         |
-| easiest for the solution. You do | configuration is a little more   |
-| not have to manage AGIC pods,    | complex and centralized inside   |
-| just configuration inside the    | the cluster. It has a more       |
-| cluster. For example, http2 is   | flexible configuration. For      |
-| deactivated on the Azure         | example, you can configure the   |
-| component and not directly in    | name of a cookie for persistent  |
-| the pod. Axway recommends using  | sessions.                        |
-| a Standard V2 Tier without       |                                  |
-| autoscaling. HTTP2 must be       | This solution does not carry any |
-| disabled.                        | additional cost.                 |
-|                                  |                                  |
-| But AGIC usage is more expensive | ![](/Images/apim-reference-architectures/container-azure/image11.J            |
-| because outbound flows are       | PG){width="3.3020833333333335in" |
-| billed at \~\$500 for 9TB.       | height="1.9631944444444445in"}   |
-|                                  |                                  |
-| ![](/Images/apim-reference-architectures/container-azure/image10.J            |                                  |
-| PG){width="3.3229166666666665in" |                                  |
-| height="1.6076388888888888in"}   |                                  |
-+----------------------------------+----------------------------------+
+#### Azure Application Gateway
+Azure Application Gateway has a mode for the Ingress controller (AGIC). It is fully managed by Azure and configuration is the easiest for the solution. You do not have to manage AGIC pods, just configuration inside the cluster. For example, http2 is deactivated on the Azure component and not directly in the pod. Axway recommends using a Standard V2 Tier without autoscaling. HTTP2 must be disabled.
+But AGIC usage is more expensive because outbound flows are billed at \~\$500 for 9TB.
+![](/Images/apim-reference-architectures/container-azure/image10.JPG
+
+#### Azure Load Balancer
+Azure Load Balancer is a traditional load balancer. An ingress component is based on Nginx. In this case, the configuration is a little more complex and centralized inside the cluster. It has a more flexible configuration. For example, you can configure the name of a cookie for persistent sessions.
+
+This solution does not carry any additional cost.
+
+![](/Images/apim-reference-architectures/container-azure/image11.JPG
+
 
 Azure Application Gateway uses Kubernetes services only for endpoint
 discovery. Then it routes requests directly to the IP's endpoint. So,
@@ -946,10 +666,10 @@ Kubernetes cluster. One of them is a network manager for communication
 between pods. The second one is a set of strong permissions for
 Kubernetes.
 
-Description                                                                                                                                            Type
------------------------------------------------------------------------------------------------------------------------------------------------------- -------------
-Network CNI mode with a specific plugin (CALICO or Cloud provider) to secure pod connections with other applications or resources inside the cluster   Recommended
-Secure Kubernetes with RBAC capabilities                                                                                                               Recommended
+|Description | Type |
+|---|---|
+|Network CNI mode with a specific plugin (CALICO or Cloud provider) to secure pod connections with other applications or resources inside the cluster  | Recommended|
+| Secure Kubernetes with RBAC capabilities  |  Recommended|
 
 #### Network plugin
 
@@ -1043,9 +763,9 @@ responsibility of API team
 therefore, preventing errors. You just use a service name
 (*\<service-name\>*).
 
-Description                                               Type
---------------------------------------------------------- -------------
-Provide all API management assets in the same namespace   Recommended
+|Description | Type |
+|---|---|
+|Provide all API management assets in the same namespace | Recommended|
 
 ### Pod resource limits
 
@@ -1059,10 +779,10 @@ case a cluster is shared with other apps. When scheduling a pod
 deployment, Kubernetes uses these limits to ensure that resources for a
 pod are available on a target node.
 
-Description                                                                        Type
----------------------------------------------------------------------------------- -------------
-Limit memory and CPU usage to protect the cluster                                  Recommended
-Change Xmx value and resources limitations according to the size of worker nodes   Recommended
+|Description | Type |
+|---|---|
+|Limit memory and CPU usage to protect the cluster                                  |Recommended|
+|Change Xmx value and resources limitations according to the size of worker nodes   |Recommended|
 
 These are the recommended initial limits for AMPLIFY API Management
 components:
@@ -1082,9 +802,9 @@ probes are respectively called "readiness probe" and "liveness probe."
 These probes are configured on all ports (traffic and UI) and use the
 HTTP/HTTPS protocol.
 
-Description                                                           Type
---------------------------------------------------------------------- ----------
-Implement Kubernetes probes to manage container status in real-time   Required
+|Description | Type |
+|---|---|
+|Implement Kubernetes probes to manage container status in real-time   |Required|
 
 ### Affinity and anti-affinity mode
 
@@ -1125,9 +845,9 @@ reason, we recommend using a Kubernetes option called
 to schedule the same replicas on the same node if it is possible based
 on the resource availability.
 
-Description                                                                                  Type
--------------------------------------------------------------------------------------------- ----------
-Dispatch APIM pods across available nodes (monitoring node can be excluded from this rule)   Required
+|Description | Type |
+|---|---|
+|Dispatch APIM pods across available nodes (monitoring node can be excluded from this rule)   |Required|
 
 *        podAntiAffinity:*
 
@@ -1215,10 +935,10 @@ for desirable endpoints, load balance traffic between pods, and
 terminate TLS connections. This mode is available only for HTTP and
 HTTPS.
 
-Description                                                                               Type
------------------------------------------------------------------------------------------ ----------
-Terminate TLS before a request reaches pods                                               Required
-Need specific DNS entry to route requests (solution with rewrite path isn't functional)   Required
+|Description | Type |
+|---|---|
+|Terminate TLS before a request reaches pods                                               |Required|
+|Need specific DNS entry to route requests (solution with rewrite path isn't functional)   |Required|
 
 A specific DNS entry is required to route requests to a service inside a
 Kubernetes cluster. These are the exposed interfaces in our
@@ -1262,59 +982,25 @@ requirements.
 
 The table below describes two options:
 
-+---------------------------+-----------------------------------------+
 | Component                 | Specifications                          |
-+===========================+=========================================+
-| Azure Application Gateway | **kubernetes.io/ing                     |
-|                           | ress.class: azure/application-gateway** |
-|                           |                                         |
-|                           | **appgw.ingress.                        |
-|                           | kubernetes.io/backend-protocol: https** |
-|                           |                                         |
-|                           | **cert-manage                           |
-|                           | r.io/cluster-issuer: letsencrypt-prod** |
-|                           |                                         |
-|                           | **cert-m                                |
-|                           | anager.io/acme-challenge-type: http01** |
-|                           |                                         |
-|                           | **appgw.ingress                         |
-|                           | .kubernetes.io/ssl-redirect: \"true\"** |
-|                           |                                         |
-|                           | **appgw.ingress.kubern                  |
-|                           | etes.io/connection-draining: \"true\"** |
-|                           |                                         |
-|                           | **appgw.ingress.kubernetes.i            |
-|                           | o/connection-draining-timeout: \"30\"** |
-+---------------------------+-----------------------------------------+
-| Nginx                     | kubernetes.io/ingress.class: nginx      |
-|                           |                                         |
-|                           | cert-mana                               |
-|                           | ger.io/cluster-issuer: letsencrypt-prod |
-|                           |                                         |
-|                           | cert                                    |
-|                           | -manager.io/acme-challenge-type: http01 |
-|                           |                                         |
-|                           | nginx.ingres                            |
-|                           | s.kubernetes.io/backend-protocol: HTTPS |
-|                           |                                         |
-|                           | nginx                                   |
-|                           | .ingress.kubernetes.io/affinity: cookie |
-|                           |                                         |
-|                           | nginx.ingress.                          |
-|                           | kubernetes.io/affinity-mode: persistent |
-|                           |                                         |
-|                           | nginx.ingress.kubernetes.io/session-    |
-|                           | cookie-name: \"API-Gateway-Manager-UI\" |
-|                           |                                         |
-|                           | nginx.ingress.kubernete                 |
-|                           | s.io/session-cookie-expires: \"172800\" |
-|                           |                                         |
-|                           | nginx.ingress.kubernete                 |
-|                           | s.io/session-cookie-max-age: \"172800\" |
-|                           |                                         |
-|                           | nginx.ingress.kubernetes.io/ses         |
-|                           | sion-cookie-change-on-failure: \"true\" |
-+---------------------------+-----------------------------------------+
+| ---                 | ---                          |
+| Azure Application Gateway | ```kubernetes.io/ingress.class: azure/application-gateway
+appgw.ingress.kubernetes.io/backend-protocol: https
+cert-manager.io/cluster-issuer: letsencrypt-prod
+cert-manager.io/acme-challenge-type: http01
+appgw.ingress.kubernetes.io/ssl-redirect: "true"
+appgw.ingress.kubernetes.io/connection-draining: "true"
+appgw.ingress.kubernetes.io/connection-draining-timeout: "30"```  |
+| Nginx                     | ```kubernetes.io/ingress.class: nginx
+cert-manager.io/cluster-issuer: letsencrypt-prod
+cert-manager.io/acme-challenge-type: http01
+nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+nginx.ingress.kubernetes.io/affinity: cookie
+nginx.ingress.kubernetes.io/affinity-mode: persistent
+nginx.ingress.kubernetes.io/session-cookie-name: "API-Gateway-Manager-UI"
+nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+nginx.ingress.kubernetes.io/session-cookie-change-on-failure: "true"```     |
 
 []{#_Toc39071619 .anchor}Table 8: Ingress controller options
 
@@ -1330,13 +1016,13 @@ registry login, and technical token for shared storage.
 
 Here is a table to list all the secrets used by pods:
 
-Admin Node Manager   API Gateway Manager   API Gateway Traffic   Ingress controller
------------------------ -------------------- --------------------- --------------------- --------------------------
-Public certificate                                                                       X (one for each ingress)
-Docker registry login   X                    X                     X
-Cassandra user ID                            X                     X
-Shared storage ID       X                    X                     X
-SGBDR user ID           X
+| |Admin Node Manager   |API Gateway Manager   |API Gateway Traffic  | Ingress controller|
+|----------------------- |:----:|:----:|:----:|:----:|
+|Public certificate      | | | |X (one for each ingress)|
+|Docker registry login   |X|X|X| |
+|Cassandra user ID       | |X|X| |
+|Shared storage ID       |X|X|X| |
+|SGBDR user ID           |X| | | |
 
 []{#_Toc39071620 .anchor}Table 9: Kubernetes secrets list
 
@@ -1776,15 +1462,9 @@ Please read this official
 [document](https://docs.microsoft.com/en-us/azure/azure-monitor/insights/container-insights-agent-config#overview-of-configurable-prometheus-scraping-settings)
 for more information.
 
-+---------------------------------------------------------------+-------------+
-| Description                                                   | Type        |
-+===============================================================+=============+
-| Use one of the following solutions:                           | Recommended |
-|                                                               |             |
-| -   Azure monitor with container analytics and logs analytics |             |
-|                                                               |             |
-| -   Prometheus with Grafana                                   |             |
-+---------------------------------------------------------------+-------------+
+| Description | Type |
+| --- | --- |
+| Use one of the following solutions:  \ -   Azure monitor with container analytics and logs analytics \ -   Prometheus with Grafana | Recommended |
 
 Environmentalization and Promotion
 ----------------------------------
@@ -1796,8 +1476,8 @@ Management uses two different artifacts:
 
 2.  API data files -- used by API Manager
 
-![](/Images/apim-reference-architectures/container-azure/image13.png){width="3.5805555555555557in"
-height="1.6208333333333333in"}The section below covers how the polices
+![](/Images/apim-reference-architectures/container-azure/image13.png)
+The section below covers how the polices
 are promoted from the development environment to the testing
 environment.
 
@@ -1870,8 +1550,8 @@ document](https://docs.axway.com/bundle/APIManager_77_APIMgmtGuide_allOS_en_HTML
 Performance testing
 -------------------
 
-![](/Images/apim-reference-architectures/container-azure/image14.png){width="7.745138888888889in"
-height="2.9618055555555554in"}The Axway team ran a variety of
+![](/Images/apim-reference-architectures/container-azure/image14.png)
+The Axway team ran a variety of
 performance tests on the reference architecture. These tests were
 executed with a testing tool JMeter. Axway recommends deploying the
 performance stack in the same VNET and the appropriate location. In our
@@ -1884,61 +1564,32 @@ payload. It is protected by basic authentication.
 
 ### Load test with 60 threads
 
-Message size   Configuration   \# of Nodes   \# of gateways   Minimal Threshold (TPS)   Result (TPS)      Duration (min)   \# of requests   90% Req duration
--------------- --------------- ------------- ---------------- ------------------------- ----------------- ---------------- ---------------- ------------------
-1Kb            Passthrough                                    \>1270                    To be completed
-API key                                        \>800                     To be completed
-OAuth                                          \>745                     To be completed
-10kb           Passthrough     3             3                \>1200                    3100              60               11211912         44.57
-API key         3             3                \>750                     3370              60               12189645         39.70
-OAuth                                          \>670                     To be completed
-50kb           API key                                        \>300                     To be completed
-100kb          Passthrough                                    \>100                     To be completed
+|Message size |  Configuration |  \# of Nodes  | \# of gateways |  Minimal Threshold (TPS) |  Result (TPS) |     Duration (min)  | \# of requests  | 90% Req duration |
+|----| ----| ---- | ---- |  ---- | ---- |  ----  | ----  | ---- |
+|1Kb|Passthrough|||\>1270|To be completed||||
+||API key|||\>800|To be completed||||
+||OAuth|||\>745|To be completed||||
+|10kb|Passthrough|3|3|\>1200|3100|60|11211912|44.57|
+||API key|3|3|\>750|3370|60|12189645|39.70|
+||OAuth|||\>670|To be completed||||
+|50kb|API key|||\>300|To be completed||||
+|100kb|Passthrough|||\>100|To be completed||||
 
 []{#_Toc39071621 .anchor}Table 10: Performance validation threshold with
 60 threads
 
 ### Load test with 200 threads
 
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-| Pa    | Con   | \# of | \# of | Mi    | R     | Dur   | \# of | 90%   |
-| yload | figur | Nodes | gat   | nimal | esult | ation | req   | Req   |
-|       | ation |       | eways | Thre  | (TPS) | (min) | uests | dur   |
-|       |       |       |       | shold |       |       |       | ation |
-|       |       |       |       | (TPS) |       |       |       |       |
-+=======+=======+=======+=======+=======+=======+=======+=======+=======+
-| 1Kb   | P     | 3     |       | \     | To be |       |       |       |
-|       | assth |       |       | >1270 | comp  |       |       |       |
-|       | rough |       |       |       | leted |       |       |       |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-|       | API   | 3     |       | \>800 | To be |       |       |       |
-|       | key   |       |       |       | comp  |       |       |       |
-|       |       |       |       |       | leted |       |       |       |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-|       | OAuth | -   3 |       | \>745 | To be |       |       |       |
-|       |       |       |       |       | comp  |       |       |       |
-|       |       |       |       |       | leted |       |       |       |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-| 10kb  | P     | 3     | 6     | \     | 5760  | 10    |       | 90.48 |
-|       | assth |       |       | >1200 |       |       |       |       |
-|       | rough |       |       |       |       |       |       |       |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-|       | API   | 3     |       | \>750 | To be |       |       |       |
-|       | key   |       |       |       | comp  |       |       |       |
-|       |       |       |       |       | leted |       |       |       |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-|       | OAuth | 3     |       | \>670 | To be |       |       |       |
-|       |       |       |       |       | comp  |       |       |       |
-|       |       |       |       |       | leted |       |       |       |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-| 50kb  | API   | 3     |       | \>300 | To be |       |       |       |
-|       | key   |       |       |       | comp  |       |       |       |
-|       |       |       |       |       | leted |       |       |       |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
-| 100kb | P     | 3     |       | \>100 | To be |       |       |       |
-|       | assth |       |       |       | comp  |       |       |       |
-|       | rough |       |       |       | leted |       |       |       |
-+-------+-------+-------+-------+-------+-------+-------+-------+-------+
+|Message size |  Configuration |  \# of Nodes  | \# of gateways |  Minimal Threshold (TPS) |  Result (TPS) |     Duration (min)  | \# of requests  | 90% Req duration |
+|----| ----| ---- | ---- |  ---- | ---- |  ----  | ----  | ---- |
+|1Kb|Passthrough|||\>1270|To be completed||||
+||API key|||\>800|To be completed||||
+||OAuth|||\>745|To be completed||||
+|10kb|Passthrough|3|6|\>1200|5760|10||90.48|
+||API key|||\>750|To be completed||||
+||OAuth|||\>670|To be completed||||
+|50kb|API key|||\>300|To be completed||||
+|100kb|Passthrough|||\>100|To be completed||||
 
 []{#_Toc39071622 .anchor}Table 11: Performance validation threshold with
 200 threads
