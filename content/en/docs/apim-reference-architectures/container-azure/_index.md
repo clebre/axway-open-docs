@@ -1,75 +1,75 @@
 {
-"title": "API Management Container Reference Architecture on Azure",
+"title": "Axway AMPLIFY™ API Management Container Reference Architecture on Azure",
 "linkTitle": "API Management Container Reference Architecture on Azure",
 "weight": 30,
 "date": "2020-04-29",
-"description": "Axway AMPLIFY™ API Management Container Reference Architecture on **Azure**"
+"description": "Reference Architecture"
 }
 
 
 Table of Contents {#table-of-contents .TOC-Heading}
 =================
 
-[1. Overview](#overview)
-[1.1. References](#references)
-[1.1.1. List of tables](#list-of-tables)
-[1.1.2. List of pictures](#list-of-pictures)
-[2. General architecture](#general-architecture)
-[2.1. Principles](#principles)
-[2.2. Target use case](#target-use-case)
-[2.3. Additional components and considerations](#additional-components-and-considerations)
-[2.3.1. Container registry](#container-registry)
-[2.3.2. Bastion host](#bastion-host)
-[2.3.3. DevOps Pipeline](#devops-pipeline)
-[2.3.4. SMTP Relay](#smtp-relay)
-[2.4. Performance goals](#performance-goals)
-[3. Implementation details](#implementation-details)
-[3.1. Diagram](#diagram)
-[3.1.1. Technical view](#technical-view)
-[3.1.2. Application view](#application-view)
-[3.2. Choice of runtime infrastructure components](#choice-of-runtime-infrastructure-components)
-[3.2.1. Network specification](#network-specification)
-[3.2.2. Azure Kubernetes Services (AKS) sizes](#azure-kubernetes-services-aks-sizes)
-[3.2.3. Cassandra cluster size](#cassandra-cluster-size)
-[3.2.4. Azure Database for Mysql](#azure-database-for-mysql)
-[3.2.5. Azure Files Premium (AFP) for shared storage](#azure-files-premium-afp-for-shared-storage.)
-[3.2.6. Azure Blob Storage for logs](#azure-blob-storage-for-logs)
-[3.2.7. Azure App Gateway or Azure Load Balancer](#azure-app-gateway-or-azure-load-balancer)
-[3.2.8. Azure Container Registry](#azure-container-registry)
-[3.3. Kubernetes considerations](#kubernetes-considerations)
-[3.3.1. Deployment options](#deployment-options)
-[3.3.2. Namespaces](#namespaces)
-[3.3.3. Pod resource limits](#pod-resource-limits)
-[3.3.4. Components healthcheck](#components-healthcheck)
-[3.3.5. Affinity and anti-affinity mode](#affinity-and-anti-affinity-mode)
-[3.3.6. Autoscaling](#autoscaling)
-[3.3.7. External traffic](#external-traffic)
-[3.3.8. Secrets](#secrets)
-[3.4. API Management implementation details](#api-management-implementation-details)
-[3.4.1. Admin Node Manager](#admin-node-manager)
-[3.4.2. API Manager UI](#api-manager-ui)
-[3.4.3. API Gateway/Manager (traffic)](#api-gatewaymanager-traffic)
-[3.5. Cassandra considerations](#cassandra-considerations)
-[3.6. Security considerations](#security-considerations)
-[3.7. SQL database considerations](#sql-database-considerations)
-[3.8. Logging/tracing](#loggingtracing)
-[3.9. Monitoring](#monitoring)
-[3.10. Environmentalization and Promotion](#environmentalization-and-promotion)
-[3.11. Performance testing](#performance-testing)
-[3.11.1. Load test with 60 threads](#load-test-with-60-threads)
-[3.11.2. Load test with 200 threads](#load-test-with-200-threads)
-[4. Maintenance](#maintenance)
-[4.1. New configurations](#new-configurations)
-[4.2. Product updates](#product-updates)
-[4.2.1. Installing a patch](#installing-a-patch)
-[4.2.2. Installing a service pack](#installing-a-service-pack)
-[4.2.3. Upgrading the product](#upgrading-the-product)
-[4.2.4. Adding customization](#adding-customization)
-[4.3. Pushing a new Docker image to your Kubernetes cluster](#pushing-a-new-docker-image-to-your-kubernetes-cluster)
-[5. Configuration and data backups](#configuration-and-data-backups)
-[6. Disaster recovery](#disaster-recovery)
-[7. Known constraints and roadmap](#known-constraints-and-roadmap)
-[8. Appendix A -- Glossary of Terms](#appendix-a-glossary-of-terms)
+[1. Overview](#overview)  
+[1.1. References](#references)  
+[1.1.1. List of tables](#list-of-tables)  
+[1.1.2. List of pictures](#list-of-pictures)  
+[2. General architecture](#general-architecture)  
+[2.1. Principles](#principles)  
+[2.2. Target use case](#target-use-case)  
+[2.3. Additional components and considerations](#additional-components-and-considerations)  
+[2.3.1. Container registry](#container-registry)  
+[2.3.2. Bastion host](#bastion-host)  
+[2.3.3. DevOps Pipeline](#devops-pipeline)  
+[2.3.4. SMTP Relay](#smtp-relay)  
+[2.4. Performance goals](#performance-goals)  
+[3. Implementation details](#implementation-details)  
+[3.1. Diagram](#diagram)  
+[3.1.1. Technical view](#technical-view)  
+[3.1.2. Application view](#application-view)  
+[3.2. Choice of runtime infrastructure components](#choice-of-runtime-infrastructure-components)  
+[3.2.1. Network specification](#network-specification)  
+[3.2.2. Azure Kubernetes Services (AKS) sizes](#azure-kubernetes-services-aks-sizes)  
+[3.2.3. Cassandra cluster size](#cassandra-cluster-size)  
+[3.2.4. Azure Database for Mysql](#azure-database-for-mysql)  
+[3.2.5. Azure Files Premium (AFP) for shared storage](#azure-files-premium-afp-for-shared-storage.)  
+[3.2.6. Azure Blob Storage for logs](#azure-blob-storage-for-logs)  
+[3.2.7. Azure App Gateway or Azure Load Balancer](#azure-app-gateway-or-azure-load-balancer)  
+[3.2.8. Azure Container Registry](#azure-container-registry)  
+[3.3. Kubernetes considerations](#kubernetes-considerations)  
+[3.3.1. Deployment options](#deployment-options)  
+[3.3.2. Namespaces](#namespaces)  
+[3.3.3. Pod resource limits](#pod-resource-limits)  
+[3.3.4. Components healthcheck](#components-healthcheck)  
+[3.3.5. Affinity and anti-affinity mode](#affinity-and-anti-affinity-mode)  
+[3.3.6. Autoscaling](#autoscaling)  
+[3.3.7. External traffic](#external-traffic)  
+[3.3.8. Secrets](#secrets)  
+[3.4. API Management implementation details](#api-management-implementation-details)  
+[3.4.1. Admin Node Manager](#admin-node-manager)  
+[3.4.2. API Manager UI](#api-manager-ui)  
+[3.4.3. API Gateway/Manager (traffic)](#api-gatewaymanager-traffic)  
+[3.5. Cassandra considerations](#cassandra-considerations)  
+[3.6. Security considerations](#security-considerations)  
+[3.7. SQL database considerations](#sql-database-considerations)  
+[3.8. Logging/tracing](#loggingtracing)  
+[3.9. Monitoring](#monitoring)  
+[3.10. Environmentalization and Promotion](#environmentalization-and-promotion)  
+[3.11. Performance testing](#performance-testing)  
+[3.11.1. Load test with 60 threads](#load-test-with-60-threads)  
+[3.11.2. Load test with 200 threads](#load-test-with-200-threads)  
+[4. Maintenance](#maintenance)  
+[4.1. New configurations](#new-configurations)  
+[4.2. Product updates](#product-updates)  
+[4.2.1. Installing a patch](#installing-a-patch)  
+[4.2.2. Installing a service pack](#installing-a-service-pack)  
+[4.2.3. Upgrading the product](#upgrading-the-product)  
+[4.2.4. Adding customization](#adding-customization)  
+[4.3. Pushing a new Docker image to your Kubernetes cluster](#pushing-a-new-docker-image-to-your-kubernetes-cluster)  
+[5. Configuration and data backups](#configuration-and-data-backups)  
+[6. Disaster recovery](#disaster-recovery)  
+[7. Known constraints and roadmap](#known-constraints-and-roadmap)  
+[8. Appendix A -- Glossary of Terms](#appendix-a-glossary-of-terms)  
 
 Summary
 
@@ -121,32 +121,32 @@ References
 
 ### List of tables
 
-[Table 1: Deployment architecture - global recommendations](#_Toc39071612)
-[Table 2: Sensitive parameters](#_Toc39071613)
-[Table 3: List of assets](#_Toc39071614)
-[Table 4: Bastion NSG rules](#_Toc39071615)
-[Table 5: AKS NSG rules](#_Toc39071616)
-[Table 6: Data NSG rules](#_Toc39071617)
-[Table 7: PaaS rules configuration](#_Toc39071618)
-[Table 8: Ingress controller options](#_Toc39071619)
-[Table 9: Kubernetes secrets list](#_Toc39071620)
-[Table 10: Performance validation threshold with 60 threads](#_Toc39071621)
-[Table 11: Performance validation threshold with 200 threads](#_Toc39071622)
+[Table 1: Deployment architecture - global recommendations](#_Toc39071612)  
+[Table 2: Sensitive parameters](#_Toc39071613)  
+[Table 3: List of assets](#_Toc39071614)  
+[Table 4: Bastion NSG rules](#_Toc39071615)  
+[Table 5: AKS NSG rules](#_Toc39071616)  
+[Table 6: Data NSG rules](#_Toc39071617)  
+[Table 7: PaaS rules configuration](#_Toc39071618)  
+[Table 8: Ingress controller options](#_Toc39071619)  
+[Table 9: Kubernetes secrets list](#_Toc39071620)  
+[Table 10: Performance validation threshold with 60 threads](#_Toc39071621)  
+[Table 11: Performance validation threshold with 200 threads](#_Toc39071622)  
 
 ### List of pictures
 
-[Figure 1: Layered deployment](#_Toc39071623)
-[Figure 2: Components overview](#_Toc39071624)
-[Figure 3: Technical diagram for HA deployment](#_Toc39071625)
-[Figure 4: Kubernetes objects deployment](#_Toc39071626)
-[Figure 5: Network flow diagram](#_Toc39071627)
-[Figure 6: Nodes pool configuration](#_Toc39071628)
-[Figure 7: Disk space setting in Policy Studio](#_Toc39071629)
-[Figure 8: Azure Application Gateway with ingress controller](#_Toc39071630)
-[Figure 9: Azure Load balancer with ingress controller](#_Toc39071631)
-[Figure 10: API and policy promotion](#_Toc39071632)
-[Figure 11: Performance diagram](#_Toc39071633)
-[Figure 12: Creating docker images](#_Toc39071634)
+[Figure 1: Layered deployment](#_Toc39071623)  
+[Figure 2: Components overview](#_Toc39071624)  
+[Figure 3: Technical diagram for HA deployment](#_Toc39071625)  
+[Figure 4: Kubernetes objects deployment](#_Toc39071626)  
+[Figure 5: Network flow diagram](#_Toc39071627)  
+[Figure 6: Nodes pool configuration](#_Toc39071628)  
+[Figure 7: Disk space setting in Policy Studio](#_Toc39071629)  
+[Figure 8: Azure Application Gateway with ingress controller](#_Toc39071630)  
+[Figure 9: Azure Load balancer with ingress controller](#_Toc39071631)  
+[Figure 10: API and policy promotion](#_Toc39071632)  
+[Figure 11: Performance diagram](#_Toc39071633)  
+[Figure 12: Creating docker images](#_Toc39071634)  
 
 General architecture
 ====================
@@ -1575,8 +1575,7 @@ payload. It is protected by basic authentication.
 |50kb|API key|||\>300|To be completed||||
 |100kb|Passthrough|||\>100|To be completed||||
 
-[]{#_Toc39071621 .anchor}Table 10: Performance validation threshold with
-60 threads
+[]{#_Toc39071621 .anchor}Table 10: Performance validation threshold with 60 threads
 
 ### Load test with 200 threads
 
@@ -1591,8 +1590,7 @@ payload. It is protected by basic authentication.
 |50kb|API key|||\>300|To be completed||||
 |100kb|Passthrough|||\>100|To be completed||||
 
-[]{#_Toc39071622 .anchor}Table 11: Performance validation threshold with
-200 threads
+[]{#_Toc39071622 .anchor}Table 11: Performance validation threshold with 200 threads
 
 Maintenance
 ===========
@@ -1619,8 +1617,8 @@ deploy a new Docker image:
 In general, the process of building AMPLIFY API Management Docker images
 for installation can be depicted as in the picture below.
 
-![](/Images/apim-reference-architectures/container-azure/image15.tmp){width="3.3333333333333335in"
-height="2.441666666666667in"}Description of the images:
+![](/Images/apim-reference-architectures/container-azure/image15.tmp)
+Description of the images:
 
 -   A base image includes a base product installation and doesn't change
 frequently. You update a base image only when you need to install an
@@ -1885,9 +1883,6 @@ could potentially lose without seriously affecting your business. A
 daily backup may be a good starting point. There are a couple of
 good blogs on backing up and restoring Cassandra:
 
-```{=html}
-<!-- -->
-```
 -   [Azure recovery service to backup VM with policy rules. Data
 retention is 2 weeks by
 default.](https://docs.microsoft.com/fr-fr/azure/backup/tutorial-backup-vm-at-scale)
@@ -1895,9 +1890,6 @@ default.](https://docs.microsoft.com/fr-fr/azure/backup/tutorial-backup-vm-at-sc
 -   [Medusa - Spotify's Apache Cassandra backup tool is now open
 source](https://thelastpickle.com/blog/2019/11/05/cassandra-medusa-backup-tool-is-open-source.html)
 
-```{=html}
-<!-- -->
-```
 -   Log/trace/even files -- Azure file premium is an Azure backup
 solution. Axway recommends a geo-redundant backup with a default
 history of 14 days.
@@ -1957,22 +1949,20 @@ You can view all roadmaps on Axway Community Portal
 Appendix A -- Glossary of Terms
 ===============================
 
-Reference   Description
------------ ----------------------------------------------------------------------------------------------
-SAML        Security Assertion Markup Language -- based on XML, this protocol permits SSO authentication
-SSO         Single Sign-On -- unique authentication for a user
-K8S         Short name of Kubernetes product
-FED         The file extension of the federated deployment package (policy + environment packages)
-POL         The file extension of a policy package file
-ENV         A file extension of an environment package file
-VM          Virtual Machine
-PaaS        Platform as a Service
-HA          High Availability
-RDBMS       Relational Database Management System
-DBaaS       Database as a Service
-IOPS
-NSG         Network Security Group
+|Reference| Description|
+|----| ----|
+|SAML        |Security Assertion Markup Language -- based on XML, this protocol permits SSO authentication|
+|SSO         |Single Sign-On -- unique authentication for a user|
+|K8S         -Short name of Kubernetes product|
+|FED         |The file extension of the federated deployment package (policy + environment packages)|
+|POL         |The file extension of a policy package file|
+|ENV         |A file extension of an environment package file|
+|VM          |Virtual Machine|
+|PaaS        |Platform as a Service|
+|HA          |High Availability|
+|RDBMS       |Relational Database Management System|
+|DBaaS       |Database as a Service|
+|IOPS||
+|NSG         |Network Security Group|
 
-[^1]: Axway publishes some development assets on GitHub. You can find
-them
-[here](https://github.com/Axway/Cloud-Automation/tree/master/APIM).
+[^1]: Axway publishes some development assets on GitHub. You can find them [here](https://github.com/Axway/Cloud-Automation/tree/master/APIM).
