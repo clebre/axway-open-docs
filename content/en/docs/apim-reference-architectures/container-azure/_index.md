@@ -359,12 +359,12 @@ configuration.
 
 |Assets |Spec|
 |--- |---|
-|Worker nodes^\*^                                   |3 to 6|
+|Worker nodes                                    |3 to 6|
 |Cassandra nodes                                    |3|
-|Azure Database for Mysql                           |[1]{.underline}|
-|Blob storage^\*^                                   |70GB|
-|Azure file storage^\*^                             |20GB|
-|External IP (public or private) ^\*^               |1 min|
+|Azure Database for Mysql                           |1|
+|Blob storage                                   |70GB|
+|Azure file storage                             |20GB|
+|External IP (public or private)                 |1 min|
 |Azure Load Balancer or Azure Application Gateway   |1|
 |Azure AD                                           |1|
 |Azure container registry                           |1|
@@ -372,7 +372,9 @@ configuration.
 |Worker pipeline                                    |1|
 *Table 3: List of assets*
 
+{{% alert title="Caution" color="warning" %}}
 These values are the minimum recommended starting point. Your actual values will depend on many factors, like the number of APIs, payload size, etc.
+{{% /alert %}}
 
 ### Network specification
 
@@ -417,8 +419,7 @@ Note: the diagram in Figure 5 shows just one availability zone.
 | 2  | Flow between Azure Load Balancer and ingress controller (see section 3.2.7 Azure App Gateway or Azure Load Balancer)      | Inbound   | AKS subnet| TCP      | 443     |
 | 3  | Connections from Axway components to Cassandra. Also used for Prometheus connection to JMX exporter port  | Outbound  | Data subnet| TCP      | 9042    |
 | 7  | Egress flow to pull Docker images    | Outbound  | Public network intranet    | TCP      | 443     |
-
-|    | EgEgress flow to send email to SMTP relay (represented by SendGrid in the diagram)  | Outbound  | Public  network intranet  | TCP      | 465-587 |
+|    | Egress flow to send email to SMTP relay (represented by SendGrid in the diagram)  | Outbound  | Public  network intranet  | TCP      | 465-587 |
 |    | Connection to external identity access management  | Outbound  | Public network intranet    | TCP      | 443     |
 | 13 | Connections from Axway components to API Analytics  | Outbound  | Azure Database for Mysql| TCP      | 3306 |
 *Table 5: AKS NSG rules*
@@ -444,9 +445,14 @@ Note: the diagram in Figure 5 shows just one availability zone.
 | 7 8 | Azure Container Registry| Firewalls and Virtual networks| Allow flow from ***AKS Subnet*** and ***Bastion Subnet.*** Also, add your ***DevOps pipeline worker*** for automatic containers creation |
 *Table 7: PaaS rules configuration*
 
+{{% alert title="Important" color="warning" %}}
+Firewalls and Virtual networks capabilities for Azure Container Registry are in preview. And a Premium SKU is required, although Axway recommend using a Standard plan.
+{{% /alert %}}
+
 ### Azure Kubernetes Services (AKS) sizes
 
-![](/Images/apim-reference-architectures/container-azure/image6.png)AKS is a platform as a Service managed by
+![](/Images/apim-reference-architectures/container-azure/image6.png)
+AKS is a platform as a Service managed by
 Microsoft. Customers cannot access the Kubernetes master component. They
 must use a client like Azure CLI or Azure Portal to configure the
 control plane. Using AKS, customers have the advantage of creating a
@@ -579,14 +585,15 @@ this architecture:
 #### Azure Application Gateway
 Azure Application Gateway has a mode for the Ingress controller (AGIC). It is fully managed by Azure and configuration is the easiest for the solution. You do not have to manage AGIC pods, just configuration inside the cluster. For example, http2 is deactivated on the Azure component and not directly in the pod. Axway recommends using a Standard V2 Tier without autoscaling. HTTP2 must be disabled.
 But AGIC usage is more expensive because outbound flows are billed at \~\$500 for 9TB.
-![](/Images/apim-reference-architectures/container-azure/image10.JPG
+
+![](/Images/apim-reference-architectures/container-azure/image10.JPG)
 
 #### Azure Load Balancer
 Azure Load Balancer is a traditional load balancer. An ingress component is based on Nginx. In this case, the configuration is a little more complex and centralized inside the cluster. It has a more flexible configuration. For example, you can configure the name of a cookie for persistent sessions.
 
 This solution does not carry any additional cost.
 
-![](/Images/apim-reference-architectures/container-azure/image11.JPG
+![](/Images/apim-reference-architectures/container-azure/image11.JPG)
 
 
 Azure Application Gateway uses Kubernetes services only for endpoint
@@ -688,17 +695,16 @@ permissions with cluster roles and binding in the cluster.
 Also, a Service Principal on Azure is required. Here are the main
 permissions:
 
--   \"Azure Kubernetes Service Cluster Admin Role\",
+-   **Azure Kubernetes Service Cluster Admin Role**,
 
--   \"AcrPull\" on all container registries where docker images and Helm
+-   **AcrPull** on all container registries where docker images and Helm
 charts are stored
 
--   \"Network Contributor\" on the vnet,
+-   **Network Contributor** on the vnet,
 
 -   Read/Write access to a storage account,
 
--   \"Managed Identity Operator\" and \"contributor\" for managed
-identity \"AAD\_POD\_IDENTITY\" 
+-   **Managed Identity Operator** and **contributor** for managed identity **AAD\_POD\_IDENTITY\** 
 
 Axway recommends 2 services principals:
 
@@ -712,7 +718,7 @@ A namespace allows splitting of a Kubernetes cluster into separated
 virtual zones. It's possible to configure multiple namespaces that will
 be logically isolated from each other. Pods from different namespaces
 can communicate with a full DNS pattern
-*(\<service-name\>.\<namespace-name\>.svc.cluster.local*). A name is
+`\<service-name\>.\<namespace-name\>.svc.cluster.local`. A name is
 unique within a namespace, but not across namespaces.
 
 As mentioned in [Kubernetes
@@ -785,23 +791,17 @@ to avoid a pod to be created in the wrong pool. By default, in AKS each
 VM has annotation with the name of node pool where it is configured. All
 node pools in AKS have the *agentpool* annotation by default.
 
-*      affinity:*
-
-*        nodeAffinity:*
-
-*          requiredDuringSchedulingIgnoredDuringExecution:*
-
-*            nodeSelectorTerms:*
-
-*            - matchExpressions:*
-
-*              - key: agentpool*
-
-*                operator: In*
-
-*                values:*
-
-*                - apimpool*
+```
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: agentpool
+                operator: In
+                values:
+                - apimpool
+```
 
 #### Anti-affinity pods
 
@@ -818,25 +818,18 @@ on the resource availability.
 |---|---|
 |Dispatch APIM pods across available nodes (monitoring node can be excluded from this rule)   |Required|
 
-*        podAntiAffinity:*
-
-*          preferredDuringSchedulingIgnoredDuringExecution:*
-
-*          - weight: 100*
-
-*            podAffinityTerm:*
-
-*              labelSelector:*
-
-*                matchExpressions:*
-
-*                  - key: app*
-
-*                    operator: In*
-
-*                    values:*
-
-*                    - traffic*
+```
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                    - traffic
+```
 
 ### Autoscaling
 
@@ -847,6 +840,7 @@ reference architecture:
 -   Nodes/VMs autoscaling
 
 -   Kubernetes pod autoscaling
+
 
 #### Node scaling
 
@@ -882,19 +876,15 @@ starting point. Keep in mind that to get HPA working, you need to define
 resource limits (notice, that our CPU limit is 2cpu, see section 3.3.3
 on page 20). This is an example of this setting in Helm:
 
-*metrics:*
-
-*- type: Resource*
-
-*resource:*
-
-*name: cpu*
-
-*target:*
-
-*type: Utilization*
-
-*averageUtilization: 75*
+```
+metrics:
+- type: Resource
+  resource:
+    name: cpu
+    target:
+      type: Utilization
+      averageUtilization: 75
+```
 
 ### External traffic
 
@@ -923,6 +913,10 @@ DNS records must match the certificate and ingress host configuration.
 These records must target the external IP used for the Kubernetes entry
 point.
 
+{{% alert title="Important" color="warning" %}}
+Important: It’s not possible to use some rewrite-path like https://FQDN/Components/ to access the web interface.
+{{% /alert %}}
+
 It's necessary to configure the following annotations for ingress
 configuration:
 
@@ -936,9 +930,6 @@ configuration:
 
 -   Specify HTTPS protocol for a back end
 
-```{=html}
-<!-- -->
-```
 -   Localization of each certificate
 
 -   A range IP authorization (optional, but recommended only for private
@@ -949,18 +940,22 @@ Kubernetes lists available ingress controllers
 and you can pick any Ingress controller option that fits your
 requirements.
 
-The table below describes two options:
+Here are the two options:
 
-| Component                 | Specifications                          |
-| ---                 | ---                          |
-| Azure Application Gateway | ```kubernetes.io/ingress.class: azure/application-gateway
+***Azure Application Gateway***
+```
+kubernetes.io/ingress.class: azure/application-gateway
 appgw.ingress.kubernetes.io/backend-protocol: https
 cert-manager.io/cluster-issuer: letsencrypt-prod
 cert-manager.io/acme-challenge-type: http01
 appgw.ingress.kubernetes.io/ssl-redirect: "true"
 appgw.ingress.kubernetes.io/connection-draining: "true"
-appgw.ingress.kubernetes.io/connection-draining-timeout: "30"```  |
-| Nginx                     | ```kubernetes.io/ingress.class: nginx
+appgw.ingress.kubernetes.io/connection-draining-timeout: "30"
+```  
+
+***Nginx***
+```
+kubernetes.io/ingress.class: nginx
 cert-manager.io/cluster-issuer: letsencrypt-prod
 cert-manager.io/acme-challenge-type: http01
 nginx.ingress.kubernetes.io/backend-protocol: HTTPS
@@ -969,9 +964,8 @@ nginx.ingress.kubernetes.io/affinity-mode: persistent
 nginx.ingress.kubernetes.io/session-cookie-name: "API-Gateway-Manager-UI"
 nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
 nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
-nginx.ingress.kubernetes.io/session-cookie-change-on-failure: "true"```     |
-
-[]{#_Toc39071619 .anchor}Table 8: Ingress controller options
+nginx.ingress.kubernetes.io/session-cookie-change-on-failure: "true"
+```
 
 Session cookie must be configured only for User Interface (API Gateway
 Manager, API Manager).
@@ -993,10 +987,10 @@ Here is a table to list all the secrets used by pods:
 |Shared storage ID       |X|X|X| |
 |SGBDR user ID           |X| | | |
 
-[]{#_Toc39071620 .anchor}Table 9: Kubernetes secrets list
+*Table 9: Kubernetes secrets list*
 
 Another solution to store sensitives information is to replace
-Kubernetes\' secret by Azure Vault.
+Kubernetes secret by Azure Vault.
 
 API Management implementation details
 -------------------------------------
@@ -1037,11 +1031,11 @@ this new listener.
 
 -   Environment variables in Default Database Connection :
 
--   *\${environment.METRICS\_DB\_URL}*
+-   `${environment.METRICS\_DB\_URL}`
 
--   *\${environment.METRICS\_DB\_USERNAME}*
+-   `${environment.METRICS\_DB\_USERNAME}`
 
--   *\${environment.METRICS\_DB\_PASS}*
+-   `${environment.METRICS\_DB\_PASS}`
 
 To deploy you need to provide:
 
@@ -1121,25 +1115,25 @@ Portal's port
 -   Create new Database connection environment variables in Default
 Database Connection:
 
--   *\${environment.METRICS\_DB\_URL}*
+-   `\${environment.METRICS\_DB\_URL}`
 
--   *\${environment.METRICS\_DB\_USERNAME}*
+-   `\${environment.METRICS\_DB\_USERNAME}`
 
--   *\${environment.METRICS\_DB\_PASS}*
+-   `\${environment.METRICS\_DB\_PASS}`
 
 -   Environment variables for Cassandra settings:
 
--   *\${environment.CASS\_HOST}*
+-   `\${environment.CASS\_HOST}`
 
--   *\${environment.CASS\_PORT}*
+-   `\${environment.CASS\_PORT}`
 
--   *\${environment.CASS\_USERNAME}*
+-   `\${environment.CASS\_USERNAME}`
 
--   *\${environment.CASS\_PASS}*
+-   `\${environment.CASS\_PASS}`
 
--   *\${environment.CASS\_KEYSPACE}*
+-   `\${environment.CASS\_KEYSPACE}`
 
--   *\${environment.CASS\_TKEYSPACE}*
+-   `\${environment.CASS\_TKEYSPACE}`
 
 -   Enable SSL and add a client certificate in Cassandra Security.
 
@@ -1387,13 +1381,15 @@ documentation](https://docs.axway.com/bundle/APIGateway_77_AdministratorGuide_al
 -   Open traffic event log -- see [this
 documentation](https://docs.axway.com/bundle/APIGateway_77_AdministratorGuide_allOS_en_HTML5/page/Content/AdminGuideTopics/log_open_traffic_event_settings.htm)
 
-> **Fluentd** is deployed on *infrapool* nodes in AKS to stream logs.
-> Fluentd is deployed on each node using a *Daemonset*. Although Fluentd
-> doesn't have an Azure blob connector, a plugin is available on
-> [GitHub](https://github.com/Microsoft/fluent-plugin-azure-storage-append-blob).
-> It's also possible to use Fluentd with Azure Log Analytics as
-> described
-> [here](https://github.com/yokawasa/fluent-plugin-azure-loganalytics).
+{{% alert title="Note" %}}
+**Fluentd** is deployed on *infrapool* nodes in AKS to stream logs.
+Fluentd is deployed on each node using a *Daemonset*. Although Fluentd
+doesn't have an Azure blob connector, a plugin is available on
+[GitHub](https://github.com/Microsoft/fluent-plugin-azure-storage-append-blob).
+It's also possible to use Fluentd with Azure Log Analytics as
+described
+[here](https://github.com/yokawasa/fluent-plugin-azure-loganalytics).
+{{% /alert %}}
 
 Monitoring
 ----------
@@ -1407,7 +1403,7 @@ Prometheus is composed of 3 services:
 -   *Server* with a Web interface. This component needs a PVC to store
 data.
 
--   *PushGateway* monitors Kubernetes\' ephemeral objects as Jobs.
+-   *PushGateway* monitors Kubernetes ephemeral objects as Jobs.
 Kubernetes jobs are used to deploy APIM.
 
 -   *AlertManager* notifies your central monitoring system or sends
@@ -1494,9 +1490,11 @@ for more info.
 
 Example
 
-*./build\_gw\_image.py \--license=license.lic \--default-cert
+```
+./build\_gw\_image.py \--license=license.lic \--default-cert
 \--pol=banking.fed \\\
-\--env=test.env \--merge-dir /home/axway/apigateway*
+\--env=test.env \--merge-dir /home/axway/apigateway
+```
 
 10. Push Docker image to your Docker registry.
 
@@ -1543,8 +1541,7 @@ payload. It is protected by basic authentication.
 ||OAuth|||\>670|To be completed||||
 |50kb|API key|||\>300|To be completed||||
 |100kb|Passthrough|||\>100|To be completed||||
-
-[]{#_Toc39071621 .anchor}Table 10: Performance validation threshold with 60 threads
+*Table 10: Performance validation threshold with 60 threads*
 
 ### Load test with 200 threads
 
@@ -1558,8 +1555,7 @@ payload. It is protected by basic authentication.
 ||OAuth|||\>670|To be completed||||
 |50kb|API key|||\>300|To be completed||||
 |100kb|Passthrough|||\>100|To be completed||||
-
-[]{#_Toc39071622 .anchor}Table 11: Performance validation threshold with 200 threads
+*Table 11: Performance validation threshold with 200 threads*
 
 Maintenance
 ===========
@@ -1606,9 +1602,7 @@ the type of images that you would rebuild frequently.
 Axway provides sample build scripts as a working example to be modified
 and used by customers. The sample scripts are provided from the Axway
 support site. For example, a download file for AMPLIFY API Management
-v7.7 is:
-
-*APIGateway\_7.7-1\_DockerScripts.tar.gz*
+v7.7 is: `APIGateway\_7.7-1\_DockerScripts.tar.gz`
 
 To streamline this process for building Docker images, Axway recommends
 creating a CI/CD pipeline that should, at least, include these tasks:
@@ -1653,27 +1647,21 @@ section](https://docs.axway.com/bundle/APIGateway_77_ContainerGuide_allOS_en_HTM
 The following is an example of a build command for a Gateway/Manager
 image:
 
-*\
+```
 ./build\_gw\_image.py*
 
-*\--license=/tmp/api\_gw.lic*
-
-*\--domain-cert=certs/mydomain/mydomain-cert.pem*
-
-*\--domain-key=certs/mydomain/mydomain-key.pem*
-
-*\--domain-key-pass-file=/tmp/pass.txt*
-
-*\--parent-image=my-base:latest*
-
-*\--fed=my-group-fed.fed \--fed-pass-file=/tmp/my-group-fedpass.txt*
-
-*\--group-id=my-group*
-
+*\--license=/tmp/api\_gw.lic*  
+\--domain-cert=certs/mydomain/mydomain-cert.pem*  
+\--domain-key=certs/mydomain/mydomain-key.pem*  
+\--domain-key-pass-file=/tmp/pass.txt*  
+\--parent-image=my-base:latest*  
+\--fed=my-group-fed.fed \--fed-pass-file=/tmp/my-group-fedpass.txt*  
+\--group-id=my-group*  
 ***\--merge-dir=/tmp/apigateway***
+```
 
-![](/Images/apim-reference-architectures/container-azure/image16.png){width="6.138888888888889in"
-height="1.475in"}The *--merge-dir* points to a directory that contains
+![](/Images/apim-reference-architectures/container-azure/image16.png)
+The `--merge-dir` points to a directory that contains
 the file(s) that will replace specific installation files on a target
 Docker image. A merge directory must be named ***apigateway***. For
 example, if you need to update the *envSettings.props* file in a Gateway
@@ -1688,46 +1676,36 @@ Let's look at applying one of the patches for APIM v7.7 -- *APIGateway
 7.7-SP1 Patch17276*:
 
 1.  Download a patch from the support website
-
-2.  Create a merge directory:
-
-*mkdir /tmp/apigateway*
-
+2.  Create a merge directory: `mkdir /tmp/apigateway`
 3.  Extract downloaded file into the merge directory:
 
-> *tar -xvzf
-> APIGateway\_7.7-SP1\_Patch17276\_d16e79fb\_allOS\_BN20191024.tgz -C
-> /tmp/apigateway/*
+```
+tar -xvzf
+APIGateway\_7.7-SP1\_Patch17276\_d16e79fb\_allOS\_BN20191024.tgz -C
+/tmp/apigateway/
+```
 
-4.  ![](/Images/apim-reference-architectures/container-azure/image17.png){width="5.743055555555555in"
-height="1.1111111111111112in"}If you look at the merge directory,
+If you look at the merge directory,
 you will see that two files will be written to a target Docker image
 during build:
+![](/Images/apim-reference-architectures/container-azure/image17.png)
 
-5.  Now you can run your build script specifying the merge directory
+Now you can run your build script specifying the merge directory
 that you've created:
+```
+./build\_gw\_image.py  
+\--license=/tmp/api\_gw.lic  
+\--domain-cert=certs/mydomain/mydomain-cert.pem  
+\--domain-key=certs/mydomain/mydomain-key.pem  
+\--domain-key-pass-file=/tmp/pass.txt  
+\--parent-image=my-base:latest  
+\--fed=my-group-fed.fed \--fed-pass-file=/tmp/my-group-fedpass.txt  
+\--group-id=my-group  
+***\--merge-dir=/tmp/apigateway***  
+\--out-image=my-gtw:7.7-SP1-p17276
+```
 
-*./build\_gw\_image.py*
-
-*\--license=/tmp/api\_gw.lic*
-
-*\--domain-cert=certs/mydomain/mydomain-cert.pem*
-
-*\--domain-key=certs/mydomain/mydomain-key.pem*
-
-*\--domain-key-pass-file=/tmp/pass.txt*
-
-*\--parent-image=my-base:latest*
-
-*\--fed=my-group-fed.fed \--fed-pass-file=/tmp/my-group-fedpass.txt*
-
-*\--group-id=my-group*
-
-***\--merge-dir=/tmp/apigateway***
-
-*\--out-image=my-gtw:7.7-SP1-p17276*
-
-6.  Two files from the patch will overwrite (or create) corresponding
+Two files from the patch will overwrite (or create) corresponding
 files in the new Docker image.
 
 ### Installing a service pack
@@ -1740,12 +1718,10 @@ AMPLIFY API Management v7.7 and API Management v7.7 with SP1install
 files:
 
 -   API Management v7.7 install is titled: *API Gateway and API Manager
-7.7 Install (linux-x86-64)* with the following file -
-*APIGateway\_7.7\_Install\_linux-x86-64\_BN4.run*
+7.7 Install (linux-x86-64)* with the following file: `APIGateway\_7.7\_Install\_linux-x86-64\_BN4.run`
 
 -   API Management v7.7 with SP1install is titled: *API Gateway 7.7
-Install Service Pack 1 (linux-x86-64)* with the following file -
-*APIGateway\_7.7\_SP1\_linux-x86-64\_BN201908271.run*
+Install Service Pack 1 (linux-x86-64)* with the following file: `APIGateway\_7.7\_SP1\_linux-x86-64\_BN201908271.run`
 
 The build process will be identical to the one described in section 4.1
 New configurations.
@@ -1783,16 +1759,13 @@ environment), we rely on Kubernetes rolling updates that are supported
 under the **Deployment** object. This object has a section that governs
 the process of updating running containers with a new Docker image. This
 is an example of an update strategy specification:
-
-*strategy:*
-
-*type: RollingUpdate*
-
-*rollingUpdate:*
-
-*maxSurge: 1*
-
-*maxUnavailable: 0*
+```
+strategy:  
+  type: RollingUpdate
+    rollingUpdate:  
+      maxSurge: 1  
+      maxUnavailable: 0
+```
 
 With the rolling update, Kubernetes will take down a designated number
 of pods, update them with a new image, and start. Then continue this
@@ -1933,5 +1906,3 @@ Appendix A -- Glossary of Terms
 |DBaaS       |Database as a Service|
 |IOPS||
 |NSG         |Network Security Group|
-
-[^1]: Axway publishes some development assets on GitHub. You can find them [here](https://github.com/Axway/Cloud-Automation/tree/master/APIM).
