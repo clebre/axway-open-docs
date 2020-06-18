@@ -7,7 +7,7 @@
 }
 
 
-Table of Contents {#table-of-contents .TOC-Heading}
+Table of Contents
 =================
 
 [1. Overview](#overview)  
@@ -72,7 +72,7 @@ Table of Contents {#table-of-contents .TOC-Heading}
 [8. Appendix A -- Glossary of Terms](#appendix-a-glossary-of-terms)  
 
 Summary
-
+=======
 This document provides a reference architecture guide for deploying
 AMPLIFY API Management (APIM) using Externally Managed Topology ([EMT
 mode](https://docs.axway.com/bundle/axway-open-docs/page/docs/apim_installation/apigw_containers/container_getstarted/index.html)).
@@ -116,38 +116,6 @@ The target audience for the document is architects, developers, and
 operations personnel. To get the most value from this document, a reader
 should have a good knowledge of Docker, Kubernetes, and API management.
 
-References
-----------
-
-### List of tables
-
-[Table 1: Deployment architecture - global recommendations](#_Toc39071612)  
-[Table 2: Sensitive parameters](#_Toc39071613)  
-[Table 3: List of assets](#_Toc39071614)  
-[Table 4: Bastion NSG rules](#_Toc39071615)  
-[Table 5: AKS NSG rules](#_Toc39071616)  
-[Table 6: Data NSG rules](#_Toc39071617)  
-[Table 7: PaaS rules configuration](#_Toc39071618)  
-[Table 8: Ingress controller options](#_Toc39071619)  
-[Table 9: Kubernetes secrets list](#_Toc39071620)  
-[Table 10: Performance validation threshold with 60 threads](#_Toc39071621)  
-[Table 11: Performance validation threshold with 200 threads](#_Toc39071622)  
-
-### List of pictures
-
-[Figure 1: Layered deployment](#_Toc39071623)  
-[Figure 2: Components overview](#_Toc39071624)  
-[Figure 3: Technical diagram for HA deployment](#_Toc39071625)  
-[Figure 4: Kubernetes objects deployment](#_Toc39071626)  
-[Figure 5: Network flow diagram](#_Toc39071627)  
-[Figure 6: Nodes pool configuration](#_Toc39071628)  
-[Figure 7: Disk space setting in Policy Studio](#_Toc39071629)  
-[Figure 8: Azure Application Gateway with ingress controller](#_Toc39071630)  
-[Figure 9: Azure Load balancer with ingress controller](#_Toc39071631)  
-[Figure 10: API and policy promotion](#_Toc39071632)  
-[Figure 11: Performance diagram](#_Toc39071633)  
-[Figure 12: Creating docker images](#_Toc39071634)  
-
 General architecture
 ====================
 
@@ -188,8 +156,9 @@ manages many important aspects of runtime, security, and operations:
 
 In generic terms, reference architecture can be built by stacking four
 layers of different capabilities:
+![](/Images/apim-reference-architectures/container-azure/image1.png)  
 
-![](/Images/apim-reference-architectures/container-azure/image1.png)Notice that the packaging of API Management
+Notice that the packaging of API Management
 for deployment has changed in the EMT mode. Customers need to build a
 new Docker image for any new FED or POL file that they want to deploy
 (see
@@ -208,9 +177,7 @@ recommended options.
 |A storage system with enough capacity to store dedicated data and to share data between components| Required|
 |A bastion for administration tasks on API management and Kubernetes|Required|
 |A container registry to store Docker images | Required|
-
-[]{#_Toc39071612 .anchor}Table 1: Deployment architecture - global
-recommendations
+*Table 1: Deployment architecture - global recommendations*
 
 Besides [Docker](https://www.docker.com/resources/what-container) and
 [Kubernetes](https://kubernetes.io), we use [Helm](https://helm.sh)
@@ -255,9 +222,9 @@ A dedicated deployment environment requires:
 -   DevOps pipeline(s) to control Docker image build and deployment to a
 target environment
 
-![](/Images/apim-reference-architectures/container-azure/image2.jpg){width="6.983333333333333in" height="3.35in"}The
-following diagram shows a general architecture of a single cluster
+The following diagram shows a general architecture of a single cluster
 configuration:
+![](/Images/apim-reference-architectures/container-azure/image2.jpg)
 
 Additional components and considerations
 ----------------------------------------
@@ -283,8 +250,7 @@ additional sensitive data that is described in the following table.
 |Docker images contain such sensitive data as license key, certificate, and configuration. This data must be protected.| Required|
 |The password is sensitive and must be encrypted in the system.| Required|
 |Operations should define a clear tag strategy for Docker images tagging. | Recommended|
-
-[]{#_Toc39071613 .anchor}Table 2: Sensitive parameters
+*Table 2: Sensitive parameters*
 
 ### Bastion host
 
@@ -334,10 +300,15 @@ Later in the document, we show an example of the performance metrics
 that have been achieved in testing a reference architecture by the Axway
 team.
 
-Implementation details[^1]
-==========================
+Implementation details
+======================
 
 This chapter details the configuration for each component.
+{{% alert title="Note" %}}
+Axway is publishes some development assets on GitHub.
+You can find them [here](https://github.com/Axway/Cloud-Automation).
+You can also interact with the Community [Journey to the Cloud](https://community.axway.com/s/group/0F92X000000CtYISA0/journey-to-the-cloud).
+{{% /alert %}}
 
 Diagram
 -------
@@ -356,17 +327,21 @@ in multiple zones. In our configuration, we use three availability
 zones. This configuration is compliant with a minimal technical SLA of
 99.99 percent. Each component will be described in the next chapters.
 
-![](/Images/apim-reference-architectures/container-azure/image3.jpg){width="7.0in" height="4.05625in"}
+![](/Images/apim-reference-architectures/container-azure/image3.jpg)
 
-**Note**: For a standard architecture, it's necessary to replace
+{{% alert title="Note" %}}
+For a standard architecture, it's necessary to replace
 Availability Zone by **availability Set** configuration. It's a
 configuration to isolating VM resources from each other. Axway
 recommends setting 3 update domains and 3 fault domains. The bigger
 impact is on the Helm chart with affinity node configuration.
+{{% /alert %}}
+
 
 ### Application view
 
-![](/Images/apim-reference-architectures/container-azure/image4.png)This diagram represents the main objects
+![](/Images/apim-reference-architectures/container-azure/image4.png)
+This diagram represents the main objects
 inside Kubernetes with main configurations. High availability is also
 present in the pod specification.
 
@@ -395,10 +370,9 @@ configuration.
 |Azure container registry                           |1|
 |Bastion                                            |1|
 |Worker pipeline                                    |1|
+*Table 3: List of assets*
 
-[]{#_Toc39071614 .anchor}Table 3: List of assets
-
-^\*\ These\ values\ are\ the\ minimum\ recommended\ starting\ point.\ Your\ actual\ values\ will\ depend\ on\ many\ factors,\ like\ the\ number\ of\ APIs,\ payload\ size,\ etc.^
+These values are the minimum recommended starting point. Your actual values will depend on many factors, like the number of APIs, payload size, etc.
 
 ### Network specification
 
@@ -434,8 +408,7 @@ Note: the diagram in Figure 5 shows just one availability zone.
 | 6  | Access for administration database tasks | Outbound  | Data subnet| TCP      | 9042  |
 | 8  | Pull (& push) Helm package on Docker registry    | Outbound  | Azure Container registry| TCP      | 443   |
 | 12 |Access to bastion hosts  | Inbound   | Bastion subnet   | TCP      | 3389 22 |
-
-[]{#_Toc39071615 .anchor}Table 4: Bastion NSG rules
+*Table 4: Bastion NSG rules*
 
 #### AKS NSG
 
@@ -448,8 +421,7 @@ Note: the diagram in Figure 5 shows just one availability zone.
 |    | EgEgress flow to send email to SMTP relay (represented by SendGrid in the diagram)  | Outbound  | Public  network intranet  | TCP      | 465-587 |
 |    | Connection to external identity access management  | Outbound  | Public network intranet    | TCP      | 443     |
 | 13 | Connections from Axway components to API Analytics  | Outbound  | Azure Database for Mysql| TCP      | 3306 |
-
-[]{#_Toc39071616 .anchor}Table 5: AKS NSG rules
+*Table 5: AKS NSG rules*
 
 #### Data NSG
 
@@ -458,8 +430,7 @@ Note: the diagram in Figure 5 shows just one availability zone.
 | 3  | Connections from Axway components to Cassandra and API Analytics   | K8S worker subnet | Data       | TCP      | 9042 3306 |
 | 6  | Administration tasks from Bastion to Databases | Bastion subnet| Data subnet  | TCP      | 9042 3306 22 |
 | 11 | Access to the administration web interface (ANM)  | Outbound   | Frontal subnet| TCP      | 443   |
-
-[]{#_Toc39071617 .anchor}Table 6: Data NSG rules
+*Table 6: Data NSG rules*
 
 #### PaaS firewalling configuration
 
@@ -470,10 +441,8 @@ Note: the diagram in Figure 5 shows just one availability zone.
 | 1a | Azure Database for Mysql | Private Endpoint   | Allow Mysql connections from ***AKS Subnet*** and ***Bastion Subnet***.        |
 | 9  | Shared Files  Premium     | Firewalls and Virtual networks| Allow flow from the **AKS subnet**.|
 | 10 11| Storage blob       | Firewalls and Virtual networks| Allow flow from the **AKS subnet**.|
-| 7 8 | Azure Container Registry| Firewalls and Virtual networks| Allow flow from ***AKS Subnet*** and ***Bastion Subnet.***
-Also, add your ***DevOps pipeline worker*** for automatic containers creation |
-
-[]{#_Toc39071618 .anchor}Table 7: PaaS rules configuration
+| 7 8 | Azure Container Registry| Firewalls and Virtual networks| Allow flow from ***AKS Subnet*** and ***Bastion Subnet.*** Also, add your ***DevOps pipeline worker*** for automatic containers creation |
+*Table 7: PaaS rules configuration*
 
 ### Azure Kubernetes Services (AKS) sizes
 
