@@ -1,11 +1,10 @@
 {
 "title": "Configure open logging",
-"linkTitle": "Configure open logging",
-"weight":"115",
-"date": "2019-10-14",
-"description": "Consolidate transaction event data, traces, and system metrics stored by API Gateway, and visualize and analyze them in external observability systems."
+  "linkTitle": "Configure open logging",
+  "weight": "115",
+  "date": "2019-10-14",
+  "description": "Consolidate transaction event data, traces, and system metrics stored by API Gateway, and visualize and analyze them in external observability systems."
 }
-
 When open logging is enabled, API Gateway generates open traffic event logs containing traffic event data in a JSON format that is easily consumed by external systems.
 
 This section describes the supported open logging flows, and explains how you can use open logging to forward log and trace information to an external system. It also describes the open traffic event log file format and configuration options.
@@ -26,7 +25,7 @@ The following diagram shows a typical transaction flow through an API Gateway.
 * Leg 1 (and subsequent legs) are the interactions between API Gateway and the back-ends.
 * The duration of leg 0 is the overall duration of the entire transaction (as seen by the client).
 * The duration of each subsequent leg is the back-end transaction duration.
-*The duration value for leg 0 minus the sum of the duration of all subsequent legs gives you the total time spent in the API Gateway for that transaction.
+
 
 The following diagram shows a typical transaction flow when multiple back-ends are involved.
 
@@ -157,8 +156,9 @@ APIGW_LOG_OPENTRAFFIC_PAYLOAD=[true | false]
 When using the open logging feature, consider the following:
 
 * Enabling the open traffic event log will have a performance impact:
-    * We recommend that you test the performance impact before using this feature in a production system.
-    * Enabling payload storage will consume additional system resources and slow down your overall TPS.
+
+  * We recommend that you test the performance impact before using this feature in a production system.
+  * Enabling payload storage will consume additional system resources and slow down your overall TPS.
 * Ensure that you have enough disk space available for storing open traffic event log files.
 * Ensure that you implement a file retention policy for open traffic event log files, as API Gateway does not delete files automatically.
 * If you enable payload storage, we recommend using fast disks (for example, SSD).
