@@ -1506,7 +1506,7 @@ API Manager promotion:
 -   API as code. The GitHub project can be used to create and promote an
 API across environments.
 
-> <https://github.com/Axway-API-Management-Plus/apimanager-swagger-promote>.
+> <https://github.com/Axway-API-Management-Plus/apim-cli>.
 
 -   Promote API using export and import mechanism - [refer to this
 document](https://docs.axway.com/bundle/APIManager_77_APIMgmtGuide_allOS_en_HTML5/page/Content/APIManagementGuideTopics/api_mgmt_promote.htm).
@@ -1648,16 +1648,15 @@ The following is an example of a build command for a Gateway/Manager
 image:
 
 ```
-./build\_gw\_image.py*
-
-*\--license=/tmp/api\_gw.lic*  
-\--domain-cert=certs/mydomain/mydomain-cert.pem*  
-\--domain-key=certs/mydomain/mydomain-key.pem*  
-\--domain-key-pass-file=/tmp/pass.txt*  
-\--parent-image=my-base:latest*  
-\--fed=my-group-fed.fed \--fed-pass-file=/tmp/my-group-fedpass.txt*  
-\--group-id=my-group*  
-***\--merge-dir=/tmp/apigateway***
+./build\_gw\_image.py
+  --license=/tmp/api\_gw.lic  
+  --domain-cert=certs/mydomain/mydomain-cert.pem  
+  --domain-key=certs/mydomain/mydomain-key.pem
+  --domain-key-pass-file=/tmp/pass.txt
+  --parent-image=my-base:latest
+  --fed=my-group-fed.fed \--fed-pass-file=/tmp/my-group-fedpass.txt  
+  --group-id=my-group
+  ***--merge-dir=/tmp/apigateway***
 ```
 
 ![](/Images/apim-reference-architectures/container-azure/image16.png)
@@ -1694,15 +1693,15 @@ Now you can run your build script specifying the merge directory
 that you've created:
 ```
 ./build\_gw\_image.py  
-\--license=/tmp/api\_gw.lic  
-\--domain-cert=certs/mydomain/mydomain-cert.pem  
-\--domain-key=certs/mydomain/mydomain-key.pem  
-\--domain-key-pass-file=/tmp/pass.txt  
-\--parent-image=my-base:latest  
-\--fed=my-group-fed.fed \--fed-pass-file=/tmp/my-group-fedpass.txt  
-\--group-id=my-group  
-***\--merge-dir=/tmp/apigateway***  
-\--out-image=my-gtw:7.7-SP1-p17276
+  --license=/tmp/api\_gw.lic  
+  --domain-cert=certs/mydomain/mydomain-cert.pem  
+  --domain-key=certs/mydomain/mydomain-key.pem  
+  --domain-key-pass-file=/tmp/pass.txt  
+  --parent-image=my-base:latest  
+  --fed=my-group-fed.fed \--fed-pass-file=/tmp/my-group-fedpass.txt  
+  --group-id=my-group  
+  ***--merge-dir=/tmp/apigateway***  
+  --out-image=my-gtw:7.7-SP1-p17276
 ```
 
 Two files from the patch will overwrite (or create) corresponding
