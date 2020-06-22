@@ -26,7 +26,6 @@ The following diagram shows a typical transaction flow through an API Gateway.
 * The duration of leg 0 is the overall duration of the entire transaction (as seen by the client).
 * The duration of each subsequent leg is the back-end transaction duration.
 
-
 The following diagram shows a typical transaction flow when multiple back-ends are involved.
 
 ![API Gateway transaction logging with multiple back-ends](/Images/APIGateway/transaction_arch_2.png)
@@ -156,9 +155,8 @@ APIGW_LOG_OPENTRAFFIC_PAYLOAD=[true | false]
 When using the open logging feature, consider the following:
 
 * Enabling the open traffic event log will have a performance impact:
-
-  * We recommend that you test the performance impact before using this feature in a production system.
-  * Enabling payload storage will consume additional system resources and slow down your overall TPS.
+    * We recommend that you test the performance impact before using this feature in a production system.
+    * Enabling payload storage will consume additional system resources and slow down your overall TPS.
 * Ensure that you have enough disk space available for storing open traffic event log files.
 * Ensure that you implement a file retention policy for open traffic event log files, as API Gateway does not delete files automatically.
 * If you enable payload storage, we recommend using fast disks (for example, SSD).
